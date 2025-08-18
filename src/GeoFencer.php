@@ -1,4 +1,8 @@
 <?php
+$dataFile = __DIR__ . '/../storage/geofence.json';
+if (!file_exists($dataFile)) {
+    throw new Exception("Geofence not set");
+}
 class GeoFencer
 {
     public function isWithinGeofence($userLat, $userLng)
