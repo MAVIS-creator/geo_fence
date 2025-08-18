@@ -52,10 +52,6 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         array (
             'Lcobucci\\JWT\\' => 13,
         ),
-        'F' => 
-        array (
-            'Firebase\\JWT\\' => 13,
-        ),
         'C' => 
         array (
             'Carbon\\Doctrine\\' => 16,
@@ -147,10 +143,6 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         'Lcobucci\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/lcobucci/jwt/src',
-        ),
-        'Firebase\\JWT\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Carbon\\Doctrine\\' => 
         array (

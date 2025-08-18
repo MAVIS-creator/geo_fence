@@ -7,8 +7,7 @@
         "monolog/monolog": "^3.9",
         "ramsey/uuid": "^4.9",
         "lcobucci/jwt": "^5.5",
-        "nesbot/carbon": "^3.10",
-        "firebase/php-jwt": "^6.11"
+        "nesbot/carbon": "^3.10"
     },
     "license": "MIT",
     "authors": [
