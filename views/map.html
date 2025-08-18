@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
       flex-direction: column;
       align-items: center;
     }
+
     #map {
       height: 500px;
       width: 100%;
@@ -22,11 +24,13 @@
       border-radius: 10px;
       overflow: hidden;
     }
+
     .controls {
       margin-top: 15px;
       display: flex;
       gap: 10px;
     }
+
     button {
       padding: 10px 15px;
       border: none;
@@ -35,9 +39,11 @@
       border-radius: 8px;
       cursor: pointer;
     }
+
     button:hover {
       background: #45a049;
     }
+
     #coords {
       margin-top: 10px;
       font-size: 14px;
@@ -48,6 +54,7 @@
     }
   </style>
 </head>
+
 <body>
   <h2>📍 Set Attendance Location</h2>
   <div class="controls">
@@ -56,9 +63,33 @@
   </div>
   <div id="map"></div>
   <div id="coords">Lat: -, Lng: -</div>
-
+  <div class="controls">
+    <input type="number" id="radius" placeholder="Radius (m)" />
+    <button id="saveGeofence">Save Geofence</button>
+  </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
+    document.getElementById('saveGeofence').addEventListener('click', () => {
+      if (!marker) {
+        alert("Please set a marker first.");
+        return;
+      }
+      const radius = document.getElementById('radius').value;
+      if (!radius) {
+        alert("Please enter a radius.");
+        return;
+      }
+
+      const { lat, lng } = marker.getLatLng();
+      fetch("../scripts/save_geofencer.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng, radius })
+      })
+        .then(res => res.text())
+        .then(msg => alert(msg))
+        .catch(err => alert("Error: " + err));
+    });
     // Initialize map
     const map = L.map('map').setView([6.5244, 3.3792], 12); // Default Lagos center
 
@@ -70,7 +101,7 @@
     let marker;
 
     // Handle click to set marker manually
-    map.on('click', function(e) {
+    map.on('click', function (e) {
       const { lat, lng } = e.latlng;
       if (marker) marker.remove();
       marker = L.marker([lat, lng]).addTo(map);
@@ -109,4 +140,5 @@
     }
   </script>
 </body>
+
 </html>
