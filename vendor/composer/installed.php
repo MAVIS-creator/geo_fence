@@ -3,13 +3,22 @@
         'name' => 'vlucas/phpdotenv',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '67af972693043b09908df6e1af11e763528a741d',
+        'reference' => '89fbed08d0a07083730c7f1456a48a877d3879ab',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'brick/math' => array(
+            'pretty_version' => '0.13.1',
+            'version' => '0.13.1.0',
+            'reference' => 'fc7ed316430118cc7836bf45faff18d5dfc8de04',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../brick/math',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'carbonphp/carbon-doctrine-types' => array(
             'pretty_version' => '3.2.0',
             'version' => '3.2.0.0',
@@ -244,7 +253,7 @@
         'vlucas/phpdotenv' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '67af972693043b09908df6e1af11e763528a741d',
+            'reference' => '89fbed08d0a07083730c7f1456a48a877d3879ab',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
