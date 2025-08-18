@@ -1,0 +1,19 @@
+{
+    "name": "vlucas/phpdotenv",
+    "type": "project",
+    "require": {
+        "respect/validation": "^2.4",
+        "symfony/security-csrf": "^7.3",
+        "monolog/monolog": "^3.9",
+        "ramsey/uuid": "^4.9",
+        "lcobucci/jwt": "^5.5",
+        "nesbot/carbon": "^3.10"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "MAVIS"
+        }
+    ],
+    "minimum-stability": "stable"
+}
