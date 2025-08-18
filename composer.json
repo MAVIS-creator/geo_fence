@@ -1,5 +1,5 @@
 {
-    "name": "vlucas/phpdotenv",
+    "name": "geo_fence/geo_fence",
     "type": "project",
     "require": {
         "respect/validation": "^2.4",
