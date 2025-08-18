@@ -3,7 +3,7 @@
         'name' => 'vlucas/phpdotenv',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '42b4d07e6871464990f99e52f50b46e11ba84976',
+        'reference' => 'c45fe56f81df81f196b402ad0ef4c6e64b809571',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -253,7 +253,7 @@
         'vlucas/phpdotenv' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '42b4d07e6871464990f99e52f50b46e11ba84976',
+            'reference' => 'c45fe56f81df81f196b402ad0ef4c6e64b809571',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
