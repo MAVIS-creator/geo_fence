@@ -1,0 +1,173 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+/* Body */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+}
+
+/* Headings */
+h1, h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+h1 {
+  font-size: 1.8rem;
+  color: #f1f1f1;
+}
+
+h2 {
+  font-size: 1.2rem;
+  color: #ddd;
+}
+
+/* Form container */
+form {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Labels + Inputs */
+label {
+  display: block;
+  margin: 0.5rem 0 0.3rem;
+  font-size: 0.9rem;
+  color: #eee;
+}
+
+input, button {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.95rem;
+}
+
+input[type="text"], input[type="number"], input[type="datetime-local"] {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  outline: none;
+}
+
+input[readonly] {
+  background: rgba(255, 255, 255, 0.1);
+  cursor: not-allowed;
+  color: #bbb;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+/* Map styling */
+#map {
+  width: 100%;
+  height: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+/* Generated link */
+input[readonly][type="text"] {
+  font-weight: bold;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: #00ffcc;
+  border: 1px solid rgba(255,255,255,0.2);
+  letter-spacing: 0.5px;
+}
+
+/* Link list */
+ul {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 500px;
+}
+
+ul li {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeInUp 0.5s ease;
+}
+
+ul li a {
+  color: #00c6ff;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+ul li a:hover {
+  color: #00ffcc;
+}
+
+/* Status message on redirect.php */
+#status {
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  animation: pulse 1.5s infinite;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 rgba(0,255,204,0.4); }
+  50% { box-shadow: 0 0 20px rgba(0,255,204,0.6); }
+  100% { box-shadow: 0 0 0 rgba(0,255,204,0.4); }
+}
