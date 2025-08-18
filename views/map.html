@@ -29,6 +29,7 @@
       margin-top: 15px;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     button {
@@ -38,13 +39,15 @@
       color: white;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.2s ease-in-out;
     }
 
     button:hover {
       background: #45a049;
     }
 
-    #coords {
+    #coords,
+    #status {
       margin-top: 10px;
       font-size: 14px;
       background: #f5f5f5;
@@ -52,53 +55,48 @@
       border-radius: 8px;
       width: fit-content;
     }
+
+    #status {
+      font-weight: bold;
+    }
   </style>
 </head>
 
 <body>
   <h2>📍 Set Attendance Location</h2>
+
+  <!-- Control buttons -->
   <div class="controls">
     <button id="useLocation">Use My Live Location</button>
     <button id="clearMarker">Clear Marker</button>
   </div>
+
+  <!-- Map container -->
   <div id="map"></div>
+
+  <!-- Show coords -->
   <div id="coords">Lat: -, Lng: -</div>
+
+  <!-- Save geofence -->
   <div class="controls">
     <input type="number" id="radius" placeholder="Radius (m)" />
     <button id="saveGeofence">Save Geofence</button>
   </div>
+
+  <!-- Status message -->
+  <div id="status"></div>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    document.getElementById('saveGeofence').addEventListener('click', () => {
-      if (!marker) {
-        alert("Please set a marker first.");
-        return;
-      }
-      const radius = document.getElementById('radius').value;
-      if (!radius) {
-        alert("Please enter a radius.");
-        return;
-      }
+    let marker;
 
-      const { lat, lng } = marker.getLatLng();
-      fetch("../scripts/save_geofencer.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lat, lng, radius })
-      })
-        .then(res => res.text())
-        .then(msg => alert(msg))
-        .catch(err => alert("Error: " + err));
-    });
     // Initialize map
     const map = L.map('map').setView([6.5244, 3.3792], 12); // Default Lagos center
 
-    // Add OpenStreetMap layer
+    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-
-    let marker;
 
     // Handle click to set marker manually
     map.on('click', function (e) {
@@ -108,7 +106,7 @@
       updateCoords(lat, lng);
     });
 
-    // Live location button
+    // Use live location
     document.getElementById('useLocation').addEventListener('click', () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
@@ -134,7 +132,40 @@
       }
     });
 
-    // Show coordinates in div
+    // Save geofence
+    document.getElementById('saveGeofence').addEventListener('click', () => {
+      if (!marker) {
+        alert("Please set a marker first.");
+        return;
+      }
+
+      const radius = document.getElementById('radius').value;
+      if (!radius || radius <= 0) {
+        alert("Please enter a valid radius (meters).");
+        return;
+      }
+
+      const { lat, lng } = marker.getLatLng();
+
+      fetch("../scripts/save_geofencer.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng, radius })
+      })
+        .then(res => res.text())
+        .then(msg => {
+          const statusEl = document.getElementById("status");
+          statusEl.innerText = "✅ " + msg;
+          statusEl.style.color = "green";
+        })
+        .catch(err => {
+          const statusEl = document.getElementById("status");
+          statusEl.innerText = "❌ Error: " + err;
+          statusEl.style.color = "red";
+        });
+    });
+
+    // Update coordinates display
     function updateCoords(lat, lng) {
       document.getElementById('coords').innerText = `Lat: ${lat}, Lng: ${lng}`;
     }
