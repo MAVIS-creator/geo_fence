@@ -20,7 +20,7 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF check
     $postedToken = $_POST['_token'] ?? '';
-    if (!$csrfManager->isTokenValid(new Symfony\Component\Security\Csrf\CsrfToken($csrfId, $postedToken))) {
+    if (!$csrfManager->isTokenValid(new symfony\Component\Security\Csrf\CsrfToken($csrfId, $postedToken))) {
         $errors[] = 'Invalid form token. Please refresh and try again.';
     } else {
         // Inputs
