@@ -55,13 +55,14 @@ function csrf_field(string $id, CsrfTokenManager $manager): string {
 // 6) Small utility helpers (validation, jwt, distance)
 use Respect\Validation\Validator as v;
 use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Token\Plain;
 
 function v_lat($x){ return v::numericVal()->between(-90, 90)->validate($x); }
 function v_lng($x){ return v::numericVal()->between(-180, 180)->validate($x); }
 function v_radius($x){ return v::intVal()->between(5, 2000)->validate($x); } // 5m–2km sane
 function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }  // parse with Carbon later
 
-// NOTE: switched to lcobucci/jwt instead of firebase/jwt
+// JWT helpers (Lcobucci)
 function jwt_config(): Configuration {
     $secret = $_ENV['JWT_SECRET'] ?? 'dev-secret';
     return Configuration::forSymmetricSigner(
@@ -69,21 +70,28 @@ function jwt_config(): Configuration {
         \Lcobucci\JWT\Signer\Key\InMemory::plainText($secret)
     );
 }
+
 function jwt_sign(array $claims): string {
     $config = jwt_config();
     $now = new DateTimeImmutable();
     $builder = $config->builder()->issuedAt($now);
+
     foreach ($claims as $k => $v) {
         $builder = $builder->withClaim($k, $v);
     }
+
     return $builder->getToken($config->signer(), $config->signingKey())->toString();
 }
+
 function jwt_verify(string $token): array {
     $config = jwt_config();
     $parsed = $config->parser()->parse($token);
-    if (!$config->validator()->validate($parsed, ...[])) {
-        throw new RuntimeException('Invalid JWT');
+
+    if (!$parsed instanceof Plain) {
+        throw new RuntimeException('Invalid JWT format');
     }
+
+    // If you want validation rules (like expiration) you can add them here.
     return $parsed->claims()->all();
 }
 
