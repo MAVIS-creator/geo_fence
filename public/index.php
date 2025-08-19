@@ -5,11 +5,12 @@ require __DIR__ . '/../bootstrap.php';
 
 use Ramsey\Uuid\Uuid;
 use Carbon\Carbon;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
-// load existing links
+// Load existing links
 $links = load_links();
 
-// generate CSRF for form
+// CSRF token for form
 $csrfId = 'create_link';
 $csrfToken = $csrfManager->getToken($csrfId)->getValue();
 
@@ -17,20 +18,21 @@ $generatedLink = null;
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF check
+    // CSRF validation
     $postedToken = $_POST['_token'] ?? '';
-    if (!$csrfManager->isTokenValid(new symfony\Component\Security\Csrf\CsrfToken($csrfId, $postedToken))) {
+    $csrfTokenObj = new CsrfToken($csrfId, $postedToken);
+    if (!$csrfManager->isTokenValid($csrfTokenObj)) {
         $errors[] = 'Invalid form token. Please refresh and try again.';
     } else {
         // Inputs
         $lat     = $_POST['lat'] ?? null;
         $lng     = $_POST['lng'] ?? null;
         $radius  = $_POST['radius'] ?? null;
-        $expires = $_POST['expires'] ?? null; // datetime-local
+        $expires = $_POST['expires'] ?? null;
 
-        // Validate
-        if (!v_lat($lat))     $errors[] = 'Latitude invalid.';
-        if (!v_lng($lng))     $errors[] = 'Longitude invalid.';
+        // Validate inputs
+        if (!v_lat($lat))      $errors[] = 'Latitude invalid.';
+        if (!v_lng($lng))      $errors[] = 'Longitude invalid.';
         if (!v_radius($radius)) $errors[] = 'Radius must be 5–2000 meters.';
         if (!v_datetime($expires)) $errors[] = 'Expiry is required.';
 
@@ -43,9 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!$errors) {
-            // Create record + sign JWT so the link is tamper‐proof
+            // Create record + save
             $id = Uuid::uuid4()->toString();
-
             $record = [
                 'id'      => $id,
                 'lat'     => (float)$lat,
@@ -57,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $links[] = $record;
             save_links($links);
 
-            // JWT includes only the id + exp (defense in depth)
+            // JWT for link
             $token = jwt_sign([
                 'sub' => 'gps-link',
                 'jti' => $id,
@@ -85,7 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <h1>📍 GPS Attendance - Create Geo-Fenced Link</h1>
 
   <?php if ($errors): ?>
-    <div id="status" style="background:rgba(255,0,0,.25)"><?php foreach($errors as $e){ echo "<div>• ".htmlspecialchars($e)."</div>"; } ?></div>
+    <div id="status" style="background:rgba(255,0,0,.25)">
+      <?php foreach($errors as $e) echo "<div>• ".htmlspecialchars($e)."</div>"; ?>
+    </div>
   <?php endif; ?>
 
   <form method="POST" novalidate>
@@ -118,8 +121,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <ul>
     <?php foreach (array_reverse($links) as $link): ?>
       <?php
-        $token = jwt_sign(['sub'=>'gps-link','jti'=>$link['id'],'exp'=>strtotime($link['expires'])]);
-        $url = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http').'://'.$_SERVER['HTTP_HOST']), '/') . '/redirect.php?token=' . $token;
+        $token = jwt_sign([
+            'sub' => 'gps-link',
+            'jti' => $link['id'],
+            'exp' => strtotime($link['expires'])
+        ]);
+        $url = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http').'://'.$_SERVER['HTTP_HOST']), '/') 
+               . '/redirect.php?token=' . $token;
       ?>
       <li>
         <span>ID: <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | Expires: <?= htmlspecialchars($link['expires']) ?></span>
