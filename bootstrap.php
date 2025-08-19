@@ -12,6 +12,7 @@ use Monolog\Level;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Carbon\Carbon;
 
 // 1) ENV
@@ -21,12 +22,16 @@ $dotenv->safeLoad();
 // 2) Timezone
 date_default_timezone_set($_ENV['TIMEZONE'] ?? 'UTC');
 
-// 3) Sessions (required for CSRF)
+// 3) Start native PHP session
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// 4) Logger
+// 4) Symfony session wrapper (required for CSRF)
+$session = new Session();
+$session->start();
+
+// 5) Logger
 $logPath = __DIR__ . '/data/app.log';
 $logger = new Logger('gps_attendance');
 $logger->pushHandler(new StreamHandler($logPath, Level::Debug));
@@ -34,32 +39,29 @@ $logger->pushHandler(new StreamHandler($logPath, Level::Debug));
 $logger->debug('Logger initialized (debug mode active)');
 $logger->info('Bootstrap loaded');
 
-// 5) CSRF Manager (native PHP session)
+// 6) CSRF Manager
 $csrfManager = new CsrfTokenManager(
     new UriSafeTokenGenerator(),
-    new SessionTokenStorage() // no RequestStack needed
+    new SessionTokenStorage($session)
 );
-
-// Example: generate token
-$csrfToken = $csrfManager->getToken('geo_form')->getValue();
 
 // Helper for embedding CSRF in forms
 function csrf_field(string $id, CsrfTokenManager $manager): string {
     $token = $manager->getToken($id)->getValue();
-    return '<input type="hidden" name="_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    return '<input type="hidden" name="_csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
 }
 
-// 6) Small utility helpers (validation, jwt, distance)
+// 7) Validation helpers
 use Respect\Validation\Validator as v;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\Plain;
 
 function v_lat($x){ return v::numericVal()->between(-90, 90)->validate($x); }
 function v_lng($x){ return v::numericVal()->between(-180, 180)->validate($x); }
-function v_radius($x){ return v::intVal()->between(5, 2000)->validate($x); } // 5m–2km sane
-function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }  // parse with Carbon later
+function v_radius($x){ return v::intVal()->between(5, 2000)->validate($x); }
+function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }
 
-// JWT helpers
+// 8) JWT helpers
 function jwt_config(): Configuration {
     $secret = $_ENV['JWT_SECRET'] ?? 'dev-secret';
     return Configuration::forSymmetricSigner(
@@ -91,15 +93,16 @@ function jwt_verify(string $token): array {
     return $parsed->claims()->all();
 }
 
+// 9) Haversine distance helper
 function haversine(float $lat1, float $lon1, float $lat2, float $lon2, int $R = 6371000): float {
     $φ1 = deg2rad($lat1); $φ2 = deg2rad($lat2);
     $Δφ = deg2rad($lat2 - $lat1); $Δλ = deg2rad($lon2 - $lon1);
     $a = sin($Δφ/2)**2 + cos($φ1)*cos($φ2)*sin($Δλ/2)**2;
     $c = 2 * asin(min(1, sqrt($a)));
-    return $R * $c; // meters
+    return $R * $c;
 }
 
-// 7) JSON store helpers
+// 10) JSON store helpers
 function links_path(): string { return __DIR__ . '/data/links.json'; }
 function load_links(): array {
     $f = links_path();
