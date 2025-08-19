@@ -12,7 +12,6 @@ use Monolog\Level;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Carbon\Carbon;
 
 // 1) ENV
@@ -27,29 +26,27 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// 4) Logger (patched to Level::Debug)
+// 4) Logger
 $logPath = __DIR__ . '/data/app.log';
 $logger = new Logger('gps_attendance');
 $logger->pushHandler(new StreamHandler($logPath, Level::Debug));
 
-// Example log usage
 $logger->debug('Logger initialized (debug mode active)');
 $logger->info('Bootstrap loaded');
 
-// 5) CSRF Manager (patched with RequestStack)
-$requestStack = new RequestStack();
+// 5) CSRF Manager (native PHP session)
 $csrfManager = new CsrfTokenManager(
     new UriSafeTokenGenerator(),
-    new SessionTokenStorage($requestStack)
+    new SessionTokenStorage() // no RequestStack needed
 );
 
 // Example: generate token
 $csrfToken = $csrfManager->getToken('geo_form')->getValue();
 
-// Example helper for embedding CSRF in forms
+// Helper for embedding CSRF in forms
 function csrf_field(string $id, CsrfTokenManager $manager): string {
     $token = $manager->getToken($id)->getValue();
-    return '<input type="hidden" name="_csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    return '<input type="hidden" name="_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
 }
 
 // 6) Small utility helpers (validation, jwt, distance)
@@ -62,7 +59,7 @@ function v_lng($x){ return v::numericVal()->between(-180, 180)->validate($x); }
 function v_radius($x){ return v::intVal()->between(5, 2000)->validate($x); } // 5m–2km sane
 function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }  // parse with Carbon later
 
-// JWT helpers (Lcobucci)
+// JWT helpers
 function jwt_config(): Configuration {
     $secret = $_ENV['JWT_SECRET'] ?? 'dev-secret';
     return Configuration::forSymmetricSigner(
@@ -91,7 +88,6 @@ function jwt_verify(string $token): array {
         throw new RuntimeException('Invalid JWT format');
     }
 
-    // If you want validation rules (like expiration) you can add them here.
     return $parsed->claims()->all();
 }
 
