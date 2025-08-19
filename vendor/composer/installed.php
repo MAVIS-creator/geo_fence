@@ -3,7 +3,7 @@
         'name' => 'geo_fence/geo_fence',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b2705ac52f2bd561c71cbe2d7e3057c98f16aa34',
+        'reference' => 'f0e056236d5b4c8d7ae8d6373b5fdb2adb7f40a3',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -40,7 +40,7 @@
         'geo_fence/geo_fence' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b2705ac52f2bd561c71cbe2d7e3057c98f16aa34',
+            'reference' => 'f0e056236d5b4c8d7ae8d6373b5fdb2adb7f40a3',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
