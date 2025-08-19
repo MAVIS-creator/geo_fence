@@ -32,6 +32,7 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
             'Symfony\\Component\\Security\\Csrf\\' => 32,
             'Symfony\\Component\\Security\\Core\\' => 32,
             'Symfony\\Component\\PasswordHasher\\' => 33,
+            'Symfony\\Component\\HttpFoundation\\' => 33,
             'Symfony\\Component\\Clock\\' => 24,
         ),
         'R' => 
@@ -124,6 +125,10 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         'Symfony\\Component\\PasswordHasher\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/password-hasher',
+        ),
+        'Symfony\\Component\\HttpFoundation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/http-foundation',
         ),
         'Symfony\\Component\\Clock\\' => 
         array (
