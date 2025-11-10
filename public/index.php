@@ -25,16 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Invalid form token. Please refresh and try again.';
     } else {
         // Inputs
-        $lat     = $_POST['lat'] ?? null;
-        $lng     = $_POST['lng'] ?? null;
-        $radius  = $_POST['radius'] ?? null;
-        $expires = $_POST['expires'] ?? null;
+        $lat        = $_POST['lat'] ?? null;
+        $lng        = $_POST['lng'] ?? null;
+        $radius     = $_POST['radius'] ?? null;
+        $expires    = $_POST['expires'] ?? null;
+        $target_url = $_POST['target_url'] ?? null;
 
         // Validate inputs
         if (!v_lat($lat))      $errors[] = 'Latitude invalid.';
         if (!v_lng($lng))      $errors[] = 'Longitude invalid.';
         if (!v_radius($radius)) $errors[] = 'Radius must be 5–2000 meters.';
         if (!v_datetime($expires)) $errors[] = 'Expiry is required.';
+        if (empty($target_url) || !filter_var($target_url, FILTER_VALIDATE_URL)) {
+            $errors[] = 'Valid target URL is required.';
+        }
 
         // Parse expiry into UTC ISO8601
         try {
@@ -48,21 +52,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Create record + save
             $id = Uuid::uuid4()->toString();
             $record = [
-                'id'      => $id,
-                'lat'     => (float)$lat,
-                'lng'     => (float)$lng,
-                'radius'  => (int)$radius,
-                'expires' => $exp->toIso8601String(),
-                'created' => Carbon::now('UTC')->toIso8601String()
+                'id'         => $id,
+                'lat'        => (float)$lat,
+                'lng'        => (float)$lng,
+                'radius'     => (int)$radius,
+                'target_url' => $target_url,
+                'expires'    => $exp->toIso8601String(),
+                'created'    => Carbon::now('UTC')->toIso8601String()
             ];
             $links[] = $record;
             save_links($links);
 
-            // JWT for link
+            // JWT for link - embed geo-fence data in the token
             $token = jwt_sign([
-                'sub' => 'gps-link',
-                'jti' => $id,
-                'exp' => $exp->getTimestamp()
+                'sub'        => 'geo-fence-link',
+                'jti'        => $id,
+                'lat'        => (float)$lat,
+                'lng'        => (float)$lng,
+                'radius'     => (int)$radius,
+                'target_url' => $target_url,
+                'exp'        => $exp->getTimestamp()
             ]);
 
             $base = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . $_SERVER['HTTP_HOST']), '/');
@@ -105,6 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label>Radius (meters)</label>
     <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
 
+    <label>Target URL (where to redirect if inside fence)</label>
+    <input type="url" name="target_url" placeholder="https://example.com/secret-page" required>
+
     <label>Expiry Date/Time</label>
     <input type="datetime-local" name="expires" required>
 
@@ -122,15 +134,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php foreach (array_reverse($links) as $link): ?>
       <?php
         $token = jwt_sign([
-            'sub' => 'gps-link',
-            'jti' => $link['id'],
-            'exp' => strtotime($link['expires'])
+            'sub'        => 'geo-fence-link',
+            'jti'        => $link['id'],
+            'lat'        => $link['lat'],
+            'lng'        => $link['lng'],
+            'radius'     => $link['radius'],
+            'target_url' => $link['target_url'],
+            'exp'        => strtotime($link['expires'])
         ]);
         $url = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http').'://'.$_SERVER['HTTP_HOST']), '/') 
                . '/redirect.php?token=' . $token;
       ?>
       <li>
-        <span>ID: <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | Expires: <?= htmlspecialchars($link['expires']) ?></span>
+        <span>ID: <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | Target: <?= htmlspecialchars($link['target_url']) ?> | Expires: <?= htmlspecialchars($link['expires']) ?></span>
         <a href="<?= htmlspecialchars($url) ?>" target="_blank">Open</a>
       </li>
     <?php endforeach; ?>
