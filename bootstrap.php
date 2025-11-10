@@ -112,3 +112,134 @@ function load_links(): array {
 function save_links(array $arr): void {
     file_put_contents(links_path(), json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 }
+
+// 11) Analytics helpers
+function analytics_path(): string { return __DIR__ . '/data/analytics.json'; }
+function load_analytics(): array {
+    $f = analytics_path();
+    if (!file_exists($f)) file_put_contents($f, json_encode([], JSON_PRETTY_PRINT));
+    return json_decode(file_get_contents($f), true) ?: [];
+}
+function save_analytics(array $arr): void {
+    file_put_contents(analytics_path(), json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function track_access(string $linkId, bool $success, array $data = []): void {
+    global $logger;
+    $analytics = load_analytics();
+    
+    if (!isset($analytics[$linkId])) {
+        $analytics[$linkId] = [
+            'total_attempts' => 0,
+            'successful_access' => 0,
+            'failed_access' => 0,
+            'first_access' => null,
+            'last_access' => null,
+            'access_log' => []
+        ];
+    }
+    
+    $analytics[$linkId]['total_attempts']++;
+    if ($success) {
+        $analytics[$linkId]['successful_access']++;
+    } else {
+        $analytics[$linkId]['failed_access']++;
+    }
+    
+    $now = Carbon::now('UTC')->toIso8601String();
+    if (!$analytics[$linkId]['first_access']) {
+        $analytics[$linkId]['first_access'] = $now;
+    }
+    $analytics[$linkId]['last_access'] = $now;
+    
+    // Keep last 50 access logs per link
+    $analytics[$linkId]['access_log'][] = array_merge([
+        'timestamp' => $now,
+        'success' => $success
+    ], $data);
+    
+    if (count($analytics[$linkId]['access_log']) > 50) {
+        $analytics[$linkId]['access_log'] = array_slice($analytics[$linkId]['access_log'], -50);
+    }
+    
+    save_analytics($analytics);
+    $logger->info('Access tracked', ['link_id' => $linkId, 'success' => $success]);
+}
+
+// 12) Rate limiting
+function rate_limit_path(): string { return __DIR__ . '/data/rate_limits.json'; }
+function load_rate_limits(): array {
+    $f = rate_limit_path();
+    if (!file_exists($f)) file_put_contents($f, json_encode([], JSON_PRETTY_PRINT));
+    return json_decode(file_get_contents($f), true) ?: [];
+}
+function save_rate_limits(array $arr): void {
+    file_put_contents(rate_limit_path(), json_encode($arr, JSON_PRETTY_PRINT));
+}
+
+function check_rate_limit(string $identifier, int $maxAttempts = 10, int $windowSeconds = 60): bool {
+    $limits = load_rate_limits();
+    $now = time();
+    
+    // Clean old entries
+    foreach ($limits as $key => $data) {
+        if (($now - $data['window_start']) > $windowSeconds) {
+            unset($limits[$key]);
+        }
+    }
+    
+    if (!isset($limits[$identifier])) {
+        $limits[$identifier] = [
+            'attempts' => 1,
+            'window_start' => $now
+        ];
+        save_rate_limits($limits);
+        return true;
+    }
+    
+    $limits[$identifier]['attempts']++;
+    save_rate_limits($limits);
+    
+    return $limits[$identifier]['attempts'] <= $maxAttempts;
+}
+
+// 13) Email notification helper
+function send_access_notification(string $linkId, array $linkData, bool $success, array $location = []): void {
+    global $logger;
+    
+    $toEmail = $_ENV['NOTIFICATION_EMAIL'] ?? null;
+    if (!$toEmail) return;
+    
+    $subject = $success ? "✅ Geo-Fence Access Granted" : "❌ Geo-Fence Access Denied";
+    $status = $success ? "GRANTED" : "DENIED";
+    $emoji = $success ? "✅" : "❌";
+    
+    $message = "
+Geo-Fence Link Access Alert {$emoji}
+
+Link ID: {$linkId}
+Status: {$status}
+Target URL: {$linkData['target_url']}
+User Location: " . ($location['lat'] ?? 'N/A') . ", " . ($location['lng'] ?? 'N/A') . "
+Distance: " . ($location['distance'] ?? 'N/A') . "m
+Time: " . date('Y-m-d H:i:s') . " UTC
+
+Fence Center: {$linkData['lat']}, {$linkData['lng']}
+Fence Radius: {$linkData['radius']}m
+";
+    
+    $headers = "From: noreply@" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\n";
+    $headers .= "Reply-To: noreply@" . ($_SERVER['HTTP_HOST'] ?? 'localhost') . "\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
+    
+    if (mail($toEmail, $subject, $message, $headers)) {
+        $logger->info('Email notification sent', ['to' => $toEmail, 'link_id' => $linkId]);
+    } else {
+        $logger->warning('Email notification failed', ['to' => $toEmail, 'link_id' => $linkId]);
+    }
+}
+
+// 14) QR Code generator (using Google Charts API as fallback)
+function generate_qr_code_url(string $data): string {
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($data);
+}
