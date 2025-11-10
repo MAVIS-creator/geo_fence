@@ -10,9 +10,6 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
-use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
-use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Carbon\Carbon;
 
 // 1) ENV
@@ -22,14 +19,10 @@ $dotenv->safeLoad();
 // 2) Timezone
 date_default_timezone_set($_ENV['TIMEZONE'] ?? 'UTC');
 
-// 3) Start native PHP session
+// 3) Start native PHP session (required for CSRF storage)
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
-// 4) Symfony session wrapper (required for CSRF)
-$session = new Session();
-$session->start();
 
 // 5) Logger
 $logPath = __DIR__ . '/data/app.log';
@@ -40,10 +33,7 @@ $logger->debug('Logger initialized (debug mode active)');
 $logger->info('Bootstrap loaded');
 
 // 6) CSRF Manager
-$csrfManager = new CsrfTokenManager(
-    new UriSafeTokenGenerator(),
-    new SessionTokenStorage($session)
-);
+$csrfManager = new CsrfTokenManager();
 
 // Helper for embedding CSRF in forms
 function csrf_field(string $id, CsrfTokenManager $manager): string {
