@@ -103,6 +103,11 @@ body {
   font-weight: 500;
 }
 
+.nav a i {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 .nav a:hover {
   background: rgba(124, 58, 237, 0.1);
   color: var(--accent-purple);
@@ -121,11 +126,24 @@ h1 {
   animation: fadeIn 0.6s ease;
 }
 
+h1 i {
+  margin-right: 8px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 h2 {
   font-size: 1.5rem;
   margin-bottom: 20px;
   color: var(--text-primary);
   font-weight: 600;
+}
+
+h2 i {
+  margin-right: 8px;
+  color: var(--accent-purple);
 }
 
 /* Cards */
@@ -202,6 +220,11 @@ button {
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
   width: 100%;
   margin-top: 8px;
+}
+
+button i {
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
 button:hover {
@@ -309,6 +332,11 @@ button.ghost:hover {
   border: 1px solid var(--border);
 }
 
+.stat i {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 /* Badges */
 .badge {
   display: inline-block;
@@ -321,6 +349,11 @@ button.ghost:hover {
   text-decoration: none;
   border: 1px solid rgba(124, 58, 237, 0.2);
   transition: all 0.3s ease;
+}
+
+.badge i {
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 .badge:hover {
@@ -448,10 +481,4 @@ ul li {
 
   .link-row {
     flex-direction: column;
-    align-items: stretch;
-  }
-
-  .stats {
-    justify-content: center;
-  }
-}
+    align-items: st
