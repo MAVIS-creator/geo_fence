@@ -16,5 +16,14 @@
         "target_url": "https://google.com",
         "expires": "2025-11-11T22:07:00+00:00",
         "created": "2025-11-11T21:49:00+00:00"
+    },
+    {
+        "id": "1326e9f5-8d70-4530-b0a9-dde848aa6da7",
+        "lat": 8.165726,
+        "lng": 4.265793,
+        "radius": 100,
+        "target_url": "https://google.com",
+        "expires": "2025-11-12T00:00:00+00:00",
+        "created": "2025-11-11T22:17:53+00:00"
     }
 ]
