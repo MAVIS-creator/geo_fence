@@ -83,6 +83,40 @@ function jwt_sign(array $claims): string {
     $now = new DateTimeImmutable();
     $builder = $config->builder()->issuedAt($now);
 
+    // Handle registered claims explicitly
+    if (isset($claims['sub'])) {
+        $builder = $builder->relatedTo((string)$claims['sub']);
+        unset($claims['sub']);
+    }
+    if (isset($claims['jti'])) {
+        $builder = $builder->identifiedBy((string)$claims['jti']);
+        unset($claims['jti']);
+    }
+    if (isset($claims['exp'])) {
+        $exp = $claims['exp'];
+        if ($exp instanceof \DateTimeInterface) {
+            $expTime = \DateTimeImmutable::createFromInterface($exp);
+        } else {
+            $expTime = (new \DateTimeImmutable())->setTimestamp((int)$exp);
+        }
+        $builder = $builder->expiresAt($expTime);
+        unset($claims['exp']);
+    }
+    if (isset($claims['nbf'])) {
+        $nbf = $claims['nbf'];
+        $nbfTime = $nbf instanceof \DateTimeInterface ? \DateTimeImmutable::createFromInterface($nbf) : (new \DateTimeImmutable())->setTimestamp((int)$nbf);
+        $builder = $builder->canOnlyBeUsedAfter($nbfTime);
+        unset($claims['nbf']);
+    }
+    if (isset($claims['iat'])) {
+        // Override issuedAt if provided
+        $iat = $claims['iat'];
+        $iatTime = $iat instanceof \DateTimeInterface ? \DateTimeImmutable::createFromInterface($iat) : (new \DateTimeImmutable())->setTimestamp((int)$iat);
+        $builder = $builder->issuedAt($iatTime);
+        unset($claims['iat']);
+    }
+
+    // Remaining custom claims
     foreach ($claims as $k => $v) {
         $builder = $builder->withClaim($k, $v);
     }

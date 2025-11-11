@@ -29,14 +29,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lng        = $_POST['lng'] ?? null;
         $radius     = $_POST['radius'] ?? null;
         $expires    = $_POST['expires'] ?? null;
-        $target_url = $_POST['target_url'] ?? null;
+    $target_url = trim($_POST['target_url'] ?? '');
+    // Normalize URLs that come without a scheme (e.g., starts with www. or bare domain)
+    if ($target_url !== '' && !preg_match('#^https?://#i', $target_url)) {
+      if (preg_match('#^www\..+#i', $target_url) || preg_match('#^[A-Za-z0-9.-]+\.[A-Za-z]{2,}(/.*)?$#', $target_url)) {
+        $target_url = 'https://' . $target_url; // default to https
+      }
+    }
 
         // Validate inputs
         if (!v_lat($lat))      $errors[] = 'Latitude invalid.';
         if (!v_lng($lng))      $errors[] = 'Longitude invalid.';
         if (!v_radius($radius)) $errors[] = 'Radius must be 5–2000 meters.';
         if (!v_datetime($expires)) $errors[] = 'Expiry is required.';
-        if (empty($target_url) || !filter_var($target_url, FILTER_VALIDATE_URL)) {
+    if (empty($target_url) || !filter_var($target_url, FILTER_VALIDATE_URL)) {
             $errors[] = 'Valid target URL is required.';
         }
 
