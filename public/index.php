@@ -127,8 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <label><i class='bx bx-ruler'></i> Radius (meters)</label>
       <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
 
-      <label><i class='bx bx-target-lock'></i> Target URL (where to redirect if inside fence)</label>
-      <input type="url" name="target_url" placeholder="https://example.com/secret-page" required>
+  <label><i class='bx bx-target-lock'></i> Target URL (where to redirect if inside fence)</label>
+  <input type="url" name="target_url" id="target_url" placeholder="example.com/secret-page" required>
+  <div id="urlHint" class="small" style="margin-top:4px;color:var(--text-muted)"></div>
 
       <label><i class='bx bx-time-five'></i> Expiry Date/Time</label>
       <input type="datetime-local" name="expires" required>
@@ -184,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <strong><?= htmlspecialchars($link['target_url']) ?></strong>
             <div class="small">
               <i class='bx bx-fingerprint'></i> <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | 
-              <i class='bx bx-map'></i> <?= htmlspecialchars($link['lat']) ?>, <?= htmlspecialchars($link['lng']) ?> | 
+              <i class='bx bx-map'></i> <?= htmlspecialchars(number_format((float)$link['lat'],6)) ?>, <?= htmlspecialchars(number_format((float)$link['lng'],6)) ?> | 
               <i class='bx bx-ruler'></i> <?= htmlspecialchars($link['radius']) ?>m | 
               <i class='bx bx-time'></i> <?= htmlspecialchars($link['expires']) ?>
             </div>
@@ -200,7 +201,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([6.5244, 3.3792], 13);
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+      const map = L.map('map').setView([6.5244, 3.3792], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
+      let marker, circle;
+
+      function setPoint(lat, lng) {
+        document.getElementById('lat').value = lat.toFixed(6);
+        document.getElementById('lng').value = lng.toFixed(6);
+        if (marker) map.removeLayer(marker);
+        if (circle) map.removeLayer(circle);
+        marker = L.marker([lat, lng]).addTo(map);
+        circle = L.circle([lat, lng], { radius: +document.getElementById('radius').value, color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.2 }).addTo(map);
+      }
+
+      map.on('click', e => setPoint(e.latlng.lat, e.latlng.lng));
+      document.getElementById('radius').addEventListener('input', () => { if (circle) circle.setRadius(+radius.value); });
+
+      document.getElementById('useLocation').addEventListener('click', () => {
+        if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
+        const btn = document.getElementById('useLocation');
+        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting location...';
+        btn.disabled = true;
+        navigator.geolocation.getCurrentPosition(p => {
+          setPoint(p.coords.latitude, p.coords.longitude);
+          map.setView([p.coords.latitude, p.coords.longitude], 16);
+          btn.innerHTML = '<i class="bx bx-check"></i> Location Set!';
+          setTimeout(() => { btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location'; btn.disabled = false; }, 2000);
+        }, () => {
+          alert('Unable to get your location. Please allow location access.');
+          btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
+          btn.disabled = false;
+        }, { enableHighAccuracy: true, timeout: 10000 });
+      });
+    }
+
+    // URL normalization hint
+    const urlInput = document.getElementById('target_url');
+    const urlHint = document.getElementById('urlHint');
+    function updateUrlHint() {
+      const raw = urlInput.value.trim();
+      if (!raw) { urlHint.textContent = ''; return; }
+      let normalized = raw;
+      if (!/^https?:\/\//i.test(raw)) {
+        if (/^www\./i.test(raw) || /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/.*)?$/.test(raw)) {
+          normalized = 'https://' + raw.replace(/^https?:\/\//i,'');
+        }
+      }
+      urlHint.innerHTML = '<i class="bx bx-info-circle"></i> Normalized: <code style="color:var(--accent-cyan)">' + normalized.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</code>';
+    }
+    urlInput.addEventListener('input', updateUrlHint);
+    urlInput.addEventListener('blur', updateUrlHint);
+    updateUrlHint();
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     let marker, circle;
 
