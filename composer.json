@@ -11,7 +11,7 @@
         "firebase/php-jwt": "^6.11",
         "vlucas/phpdotenv": "^5.6",
         "symfony/http-foundation": "^7.3",
-        "endroid/qr-code": "*"
+        "endroid/qr-code": "^6.0"
     },
     "license": "MIT",
     "authors": [

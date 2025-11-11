@@ -66,9 +66,14 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         array (
             'Firebase\\JWT\\' => 13,
         ),
+        'E' => 
+        array (
+            'Endroid\\QrCode\\' => 15,
+        ),
         'D' => 
         array (
             'Dotenv\\' => 7,
+            'DASPRiD\\Enum\\' => 13,
         ),
         'C' => 
         array (
@@ -78,6 +83,7 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         'B' => 
         array (
             'Brick\\Math\\' => 11,
+            'BaconQrCode\\' => 12,
         ),
     );
 
@@ -186,9 +192,17 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
+        'Endroid\\QrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/endroid/qr-code/src',
+        ),
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
+        ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
         ),
         'Carbon\\Doctrine\\' => 
         array (
@@ -201,6 +215,10 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         'Brick\\Math\\' => 
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 

@@ -229,7 +229,22 @@ Fence Radius: {$linkData['radius']}m
     }
 }
 
-// 14) QR Code generator (using Google Charts API as fallback)
+// 14) QR Code generator
 function generate_qr_code_url(string $data): string {
-    return 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($data);
+    try {
+        $writer = new \Endroid\QrCode\Writer\PngWriter();
+        $qrCode = \Endroid\QrCode\QrCode::create($data)
+            ->setSize(300)
+            ->setMargin(10);
+        
+        $result = $writer->write($qrCode);
+        
+        // Return as data URI for inline embedding
+        return $result->getDataUri();
+    } catch (Exception $e) {
+        global $logger;
+        $logger->error('QR code generation failed', ['error' => $e->getMessage()]);
+        // Fallback to external API
+        return 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($data);
+    }
 }
