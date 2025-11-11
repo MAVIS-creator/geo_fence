@@ -90,19 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Geo-Fence Link Generator</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <div class="logo"><div class="mark">GF</div><div class="title">Geo-Fence Link Generator</div></div>
-      <div class="nav"><a href="dashboard.php">📊 Dashboard</a></div>
+      <div class="nav"><a href="dashboard.php"><i class='bx bx-bar-chart-alt-2'></i> Dashboard</a></div>
     </div>
 
-    <h1>📍 Create a Geo-Fenced Link</h1>
+    <h1><i class='bx bx-map-pin'></i> Create a Geo-Fenced Link</h1>
 
     <?php if ($errors): ?>
       <div class="card" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)">
-        <?php foreach($errors as $e) echo "<div>❌ ".htmlspecialchars($e)."</div>"; ?>
+        <?php foreach($errors as $e) echo "<div><i class='bx bx-x-circle'></i> ".htmlspecialchars($e)."</div>"; ?>
       </div>
     <?php endif; ?>
 
@@ -111,33 +112,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div id="map"></div>
 
-      <label>📍 Latitude</label>
+      <label><i class='bx bx-map-pin'></i> Latitude</label>
       <input type="text" name="lat" id="lat" readonly required>
 
-      <label>📍 Longitude</label>
+      <label><i class='bx bx-map-pin'></i> Longitude</label>
       <input type="text" name="lng" id="lng" readonly required>
 
-      <label>📏 Radius (meters)</label>
+      <label><i class='bx bx-ruler'></i> Radius (meters)</label>
       <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
 
-      <label>🎯 Target URL (where to redirect if inside fence)</label>
+      <label><i class='bx bx-target-lock'></i> Target URL (where to redirect if inside fence)</label>
       <input type="url" name="target_url" placeholder="https://example.com/secret-page" required>
 
-      <label>⏰ Expiry Date/Time</label>
+      <label><i class='bx bx-time-five'></i> Expiry Date/Time</label>
       <input type="datetime-local" name="expires" required>
 
-      <button type="button" id="useLocation">📡 Use My Current Location</button>
-      <button type="submit">🚀 Generate Geo-Fenced Link</button>
+      <button type="button" id="useLocation"><i class='bx bx-current-location'></i> Use My Current Location</button>
+      <button type="submit"><i class='bx bx-send'></i> Generate Geo-Fenced Link</button>
     </form>
 
     <?php if (!empty($generatedLink)): ?>
       <div class="card generated">
         <div style="flex:1">
-          <p style="font-size:1.1rem;margin-bottom:12px"><strong>✅ Link Generated Successfully!</strong></p>
+          <p style="font-size:1.1rem;margin-bottom:12px"><strong><i class='bx bx-check-circle'></i> Link Generated Successfully!</strong></p>
           <input id="generatedLink" type="text" value="<?= htmlspecialchars($generatedLink) ?>" readonly style="width:100%">
           <div style="margin-top:12px;display:flex;gap:8px">
-            <button type="button" id="copyLink" class="ghost" style="width:auto">📋 Copy Link</button>
-            <a href="<?= htmlspecialchars($generatedLink) ?>" target="_blank" style="flex:1"><button type="button" style="width:100%">🔗 Open Link</button></a>
+            <button type="button" id="copyLink" class="ghost" style="width:auto"><i class='bx bx-copy'></i> Copy Link</button>
+            <a href="<?= htmlspecialchars($generatedLink) ?>" target="_blank" style="flex:1"><button type="button" style="width:100%"><i class='bx bx-link-external'></i> Open Link</button></a>
           </div>
         </div>
         <div class="qr">
@@ -148,13 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById('copyLink').addEventListener('click', () => {
           const el = document.getElementById('generatedLink');
           navigator.clipboard.writeText(el.value).then(()=>{
-            alert('✅ Link copied to clipboard!');
+            alert('Link copied to clipboard!');
           });
         });
       </script>
     <?php endif; ?>
 
-    <h2>📝 Recent Links</h2>
+    <h2><i class='bx bx-list-ul'></i> Recent Links</h2>
     <?php if (empty($links)): ?>
       <p class="small" style="text-align:center;padding:20px">No links created yet. Generate your first geo-fenced link above!</p>
     <?php else: ?>
@@ -176,15 +177,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div>
             <strong><?= htmlspecialchars($link['target_url']) ?></strong>
             <div class="small">
-              🆔 <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | 
-              📍 <?= htmlspecialchars($link['lat']) ?>, <?= htmlspecialchars($link['lng']) ?> | 
-              📏 <?= htmlspecialchars($link['radius']) ?>m | 
-              ⏰ <?= htmlspecialchars($link['expires']) ?>
+              <i class='bx bx-fingerprint'></i> <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | 
+              <i class='bx bx-map'></i> <?= htmlspecialchars($link['lat']) ?>, <?= htmlspecialchars($link['lng']) ?> | 
+              <i class='bx bx-ruler'></i> <?= htmlspecialchars($link['radius']) ?>m | 
+              <i class='bx bx-time'></i> <?= htmlspecialchars($link['expires']) ?>
             </div>
           </div>
           <div style="display:flex;gap:8px">
-            <a href="<?= htmlspecialchars($url) ?>" target="_blank" class="badge">🔗 Open</a>
-            <a href="dashboard.php" class="badge">📊 Stats</a>
+            <a href="<?= htmlspecialchars($url) ?>" target="_blank" class="badge"><i class='bx bx-link-external'></i> Open</a>
+            <a href="dashboard.php" class="badge"><i class='bx bx-bar-chart-alt-2'></i> Stats</a>
           </div>
         </div>
       <?php endforeach; ?>
@@ -210,23 +211,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     document.getElementById('radius').addEventListener('input', () => { if (circle) circle.setRadius(+radius.value); });
 
     document.getElementById('useLocation').addEventListener('click', () => {
-      if (!navigator.geolocation) return alert('❌ Geolocation not supported by your browser.');
+      if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
       
       const btn = document.getElementById('useLocation');
-      btn.textContent = '⏳ Getting location...';
+      btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting location...';
       btn.disabled = true;
       
       navigator.geolocation.getCurrentPosition(p => {
         setPoint(p.coords.latitude, p.coords.longitude);
         map.setView([p.coords.latitude, p.coords.longitude], 16);
-        btn.textContent = '✅ Location Set!';
+        btn.innerHTML = '<i class="bx bx-check"></i> Location Set!';
         setTimeout(() => {
-          btn.textContent = '📡 Use My Current Location';
+          btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
           btn.disabled = false;
         }, 2000);
       }, () => {
-        alert('❌ Unable to get your location. Please allow location access.');
-        btn.textContent = '📡 Use My Current Location';
+        alert('Unable to get your location. Please allow location access.');
+        btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
         btn.disabled = false;
       }, {
         enableHighAccuracy: true,
