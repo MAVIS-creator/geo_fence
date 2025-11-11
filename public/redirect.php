@@ -2,7 +2,7 @@
 // public/redirect.php
 declare(strict_types=1);
 
-require __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 // Get JWT token from URL
 $token = $_GET['token'] ?? null;
