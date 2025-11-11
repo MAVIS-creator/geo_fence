@@ -21,8 +21,23 @@ try {
     die("❌ Invalid or tampered token.");
 }
 
-// Check expiration
-if (isset($claims['exp']) && $claims['exp'] < time()) {
+// Check expiration (handle DateTimeInterface or timestamp)
+if (isset($claims['exp'])) {
+  $expVal = $claims['exp'];
+  if ($expVal instanceof \DateTimeInterface) {
+    $expTs = $expVal->getTimestamp();
+  } elseif (is_numeric($expVal)) {
+    $expTs = (int)$expVal;
+  } else {
+    $expTs = null;
+  }
+
+  if ($expTs !== null && $expTs < time()) {
+    http_response_code(410);
+    $logger->info('Expired token accessed', ['jti' => $claims['jti'] ?? 'unknown']);
+    die("❌ This link has expired.");
+  }
+}
     http_response_code(410);
     $logger->info('Expired token accessed', ['jti' => $claims['jti'] ?? 'unknown']);
     die("❌ This link has expired.");
