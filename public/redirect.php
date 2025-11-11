@@ -42,55 +42,77 @@ if (!$targetLat || !$targetLng || !$radius || !$targetUrl) {
 
 // Handle AJAX location verification
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
+  header('Content-Type: application/json');
     
-    $userLat = $_POST['lat'] ?? null;
-    $userLng = $_POST['lng'] ?? null;
+  $userLat = $_POST['lat'] ?? null;
+  $userLng = $_POST['lng'] ?? null;
 
-    if (!$userLat || !$userLng) {
-        echo json_encode(['status' => 'error', 'message' => 'Missing location data']);
-        exit;
-    }
-
-    // Calculate distance using haversine
-    $distance = haversine(
-        (float)$targetLat,
-        (float)$targetLng,
-        (float)$userLat,
-        (float)$userLng
-    );
-
-    if ($distance <= $radius) {
-        // ✅ Inside fence - log and allow redirect
-        $logger->info('Geo-fence access granted', [
-            'link_id' => $linkId,
-            'user_lat' => $userLat,
-            'user_lng' => $userLng,
-            'distance' => round($distance, 2),
-            'target' => $targetUrl
-        ]);
-
-        echo json_encode([
-            'status' => 'success',
-            'message' => '✅ Access granted! Redirecting...',
-            'redirect_url' => $targetUrl
-        ]);
-    } else {
-        // ❌ Outside fence
-        $logger->warning('Geo-fence access denied', [
-            'link_id' => $linkId,
-            'user_lat' => $userLat,
-            'user_lng' => $userLng,
-            'distance' => round($distance, 2),
-            'required_radius' => $radius
-        ]);
-
-        echo json_encode([
-            'status' => 'error',
-            'message' => "❌ You're {$distance}m away. Must be within {$radius}m."
-        ]);
-    }
+  if (!$userLat || !$userLng) {
+    echo json_encode(['status' => 'error', 'message' => 'Missing location data']);
     exit;
+  }
+
+  // Rate limiting by IP+link
+  $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+  $identifier = md5($ip . '|' . $linkId);
+  if (!check_rate_limit($identifier, (int)($_ENV['RATE_LIMIT_MAX'] ?? 15), (int)($_ENV['RATE_LIMIT_WINDOW'] ?? 60))) {
+    http_response_code(429);
+    $logger->warning('Rate limit exceeded', ['id' => $identifier, 'ip' => $ip, 'link' => $linkId]);
+    track_access($linkId, false, ['reason' => 'rate_limited', 'ip' => $ip]);
+    echo json_encode(['status' => 'error', 'message' => 'Too many attempts. Please try again later.']);
+    exit;
+  }
+
+  // Calculate distance using haversine
+  $distance = haversine(
+    (float)$targetLat,
+    (float)$targetLng,
+    (float)$userLat,
+    (float)$userLng
+  );
+
+  $success = $distance <= $radius;
+
+  // Track analytics
+  track_access($linkId, $success, [
+    'ip' => $ip,
+    'user_lat' => (float)$userLat,
+    'user_lng' => (float)$userLng,
+    'distance' => round($distance, 2)
+  ]);
+
+  // Send optional notification
+  send_access_notification($linkId, ['lat' => $targetLat, 'lng' => $targetLng, 'radius' => $radius, 'target_url' => $targetUrl], $success, ['lat' => $userLat, 'lng' => $userLng, 'distance' => round($distance,2)]);
+
+  if ($success) {
+    $logger->info('Geo-fence access granted', [
+      'link_id' => $linkId,
+      'user_lat' => $userLat,
+      'user_lng' => $userLng,
+      'distance' => round($distance, 2),
+      'target' => $targetUrl
+    ]);
+
+    echo json_encode([
+      'status' => 'success',
+      'message' => '✅ Access granted! Redirecting...',
+      'redirect_url' => $targetUrl
+    ]);
+  } else {
+    $logger->warning('Geo-fence access denied', [
+      'link_id' => $linkId,
+      'user_lat' => $userLat,
+      'user_lng' => $userLng,
+      'distance' => round($distance, 2),
+      'required_radius' => $radius
+    ]);
+
+    echo json_encode([
+      'status' => 'error',
+      'message' => "❌ You're {" . round($distance,2) . "}m away. Must be within {$radius}m."
+    ]);
+  }
+  exit;
 }
 ?>
 <!DOCTYPE html>
