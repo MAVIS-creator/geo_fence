@@ -11,6 +11,11 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Carbon\Carbon;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
 
 // 1) ENV
 $dotenv = Dotenv::createImmutable(__DIR__);
@@ -232,11 +237,16 @@ Fence Radius: {$linkData['radius']}m
 // 14) QR Code generator
 function generate_qr_code_url(string $data): string {
     try {
-        $qrCode = new \Endroid\QrCode\QrCode($data);
-        $qrCode->setSize(300);
-        $qrCode->setMargin(10);
+        $qrCode = new QrCode(
+            data: $data,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Low,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin
+        );
         
-        $writer = new \Endroid\QrCode\Writer\PngWriter();
+        $writer = new PngWriter();
         $result = $writer->write($qrCode);
         
         // Return as data URI for inline embedding
