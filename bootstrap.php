@@ -24,10 +24,14 @@ $dotenv->safeLoad();
 // 2) Timezone
 date_default_timezone_set($_ENV['TIMEZONE'] ?? 'UTC');
 
-// 3) Start native PHP session (required for CSRF storage)
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+// 3) Session: defer to Symfony's NativeSessionTokenStorage implicit start.
+// Avoid explicitly calling session_start() to prevent double-start errors when other components manage the session.
+// We only ensure headers not sent and let CsrfTokenManager trigger session start lazily.
+// If a session is already active we leave it; if not, NativeSessionTokenStorage will start it.
+// (If you need early access to $_SESSION, uncomment the block below.)
+// if (session_status() === PHP_SESSION_NONE) {
+//     session_start();
+// }
 
 // 5) Logger
 $logPath = __DIR__ . '/data/app.log';
