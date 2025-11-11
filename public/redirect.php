@@ -38,10 +38,6 @@ if (isset($claims['exp'])) {
     die("❌ This link has expired.");
   }
 }
-    http_response_code(410);
-    $logger->info('Expired token accessed', ['jti' => $claims['jti'] ?? 'unknown']);
-    die("❌ This link has expired.");
-}
 
 // Extract geo-fence data
 $targetLat = $claims['lat'] ?? null;
