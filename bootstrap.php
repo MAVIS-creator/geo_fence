@@ -232,11 +232,11 @@ Fence Radius: {$linkData['radius']}m
 // 14) QR Code generator
 function generate_qr_code_url(string $data): string {
     try {
-        $writer = new \Endroid\QrCode\Writer\PngWriter();
-        $qrCode = \Endroid\QrCode\QrCode::create($data)
-            ->setSize(300)
-            ->setMargin(10);
+        $qrCode = new \Endroid\QrCode\QrCode($data);
+        $qrCode->setSize(300);
+        $qrCode->setMargin(10);
         
+        $writer = new \Endroid\QrCode\Writer\PngWriter();
         $result = $writer->write($qrCode);
         
         // Return as data URI for inline embedding
