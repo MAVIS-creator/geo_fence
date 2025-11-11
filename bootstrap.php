@@ -57,10 +57,18 @@ use Respect\Validation\Validator as v;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Token\Plain;
 
-function v_lat($x){ return v::numericVal()->between(-90, 90)->validate($x); }
-function v_lng($x){ return v::numericVal()->between(-180, 180)->validate($x); }
-function v_radius($x){ return v::intVal()->between(5, 2000)->validate($x); }
-function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }
+if (!function_exists('v_lat')) {
+    function v_lat($x){ return v::numericVal()->between(-90, 90)->validate($x); }
+}
+if (!function_exists('v_lng')) {
+    function v_lng($x){ return v::numericVal()->between(-180, 180)->validate($x); }
+}
+if (!function_exists('v_radius')) {
+    function v_radius($x){ return v::intVal()->between(5, 2000)->validate($x); }
+}
+if (!function_exists('v_datetime')) {
+    function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }
+}
 
 // 8) JWT helpers
 function jwt_config(): Configuration {
