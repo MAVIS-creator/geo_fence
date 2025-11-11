@@ -368,6 +368,11 @@ button.ghost:hover {
   margin-top: 4px;
 }
 
+.small i {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 /* Lists */
 ul {
   list-style: none;
@@ -406,6 +411,16 @@ ul li {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: #ef4444;
+}
+
+/* Boxicons animations */
+.bx-spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Animations */
