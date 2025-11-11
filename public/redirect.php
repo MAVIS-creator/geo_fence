@@ -122,22 +122,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Geo-Fenced Link - Verifying Location</title>
   <link rel="stylesheet" href="assets/style.css">
-  <style>
-    #status { 
-      padding: 1.5rem; 
-      margin: 1rem 0; 
-      border-radius: 8px;
-      text-align: center;
-      font-size: 1.1rem;
-    }
-    .loading { background: rgba(255, 200, 0, 0.2); }
-    .success { background: rgba(0, 255, 0, 0.2); }
-    .error { background: rgba(255, 0, 0, 0.2); }
-  </style>
 </head>
 <body>
-  <h1>🔒 Geo-Fenced Link</h1>
-  <p id="status" class="loading">📡 Verifying your location...</p>
+  <div class="container" style="max-width:600px;text-align:center;margin-top:60px">
+    <div style="font-size:4rem;margin-bottom:20px">🔒</div>
+    <h1>Geo-Fenced Link</h1>
+    <p id="status" class="loading">📡 Verifying your location...</p>
+    <p class="small" style="margin-top:12px">Please allow location access when prompted</p>
+  </div>
 
   <script>
     function verifyLocation(lat, lng) {
