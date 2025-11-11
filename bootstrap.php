@@ -45,9 +45,11 @@ $logger->info('Bootstrap loaded');
 $csrfManager = new CsrfTokenManager();
 
 // Helper for embedding CSRF in forms
-function csrf_field(string $id, CsrfTokenManager $manager): string {
-    $token = $manager->getToken($id)->getValue();
-    return '<input type="hidden" name="_csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+if (!function_exists('csrf_field')) {
+    function csrf_field(string $id, CsrfTokenManager $manager): string {
+        $token = $manager->getToken($id)->getValue();
+        return '<input type="hidden" name="_csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    }
 }
 
 // 7) Validation helpers
