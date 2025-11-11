@@ -92,7 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <style>#map{height:300px;margin-bottom:1rem}</style>
 </head>
 <body>
-  <h1>📍 GPS Attendance - Create Geo-Fenced Link</h1>
+  <div class="header">
+    <div class="logo"><div class="mark">GF</div><div class="title">Geo-Fence Link Generator</div></div>
+    <div class="nav"><a href="dashboard.php">Dashboard</a></div>
+  </div>
+
+  <h1>📍 Create a Geo-Fenced Link</h1>
 
   <?php if ($errors): ?>
     <div id="status" style="background:rgba(255,0,0,.25)">
@@ -125,8 +130,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </form>
 
   <?php if (!empty($generatedLink)): ?>
-    <p><strong>✅ Link Generated:</strong></p>
-    <input type="text" value="<?= htmlspecialchars($generatedLink) ?>" readonly style="width:100%">
+    <div class="card generated">
+      <div style="flex:1">
+        <p><strong>✅ Link Generated:</strong></p>
+        <input id="generatedLink" type="text" value="<?= htmlspecialchars($generatedLink) ?>" readonly style="width:100%">
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="copyLink" class="ghost">Copy Link</button>
+          <a href="<?= htmlspecialchars($generatedLink) ?>" target="_blank"><button>Open Link</button></a>
+        </div>
+      </div>
+      <div class="qr">
+        <img src="<?= htmlspecialchars(generate_qr_code_url($generatedLink)) ?>" alt="QR" width="120" height="120">
+      </div>
+    </div>
+    <script>
+      document.getElementById('copyLink').addEventListener('click', () => {
+        const el = document.getElementById('generatedLink');
+        navigator.clipboard.writeText(el.value).then(()=>{
+          alert('Link copied to clipboard');
+        });
+      });
+    </script>
   <?php endif; ?>
 
   <h2>Existing Links</h2>
