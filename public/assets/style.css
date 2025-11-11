@@ -481,4 +481,10 @@ ul li {
 
   .link-row {
     flex-direction: column;
-    align-items: st
+    align-items: stretch;
+  }
+
+  .stats {
+    justify-content: center;
+  }
+}
