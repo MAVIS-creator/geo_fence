@@ -122,12 +122,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Geo-Fenced Link - Verifying Location</title>
   <link rel="stylesheet" href="assets/style.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
   <div class="container" style="max-width:600px;text-align:center;margin-top:60px">
-    <div style="font-size:4rem;margin-bottom:20px">🔒</div>
+    <div style="font-size:4rem;margin-bottom:20px"><i class='bx bx-lock-alt'></i></div>
     <h1>Geo-Fenced Link</h1>
-    <p id="status" class="loading">📡 Verifying your location...</p>
+    <p id="status" class="loading"><i class='bx bx-current-location bx-spin'></i> Verifying your location...</p>
     <p class="small" style="margin-top:12px">Please allow location access when prompted</p>
   </div>
 
@@ -144,21 +145,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       .then(res => res.json())
       .then(data => {
         const statusEl = document.getElementById("status");
-        statusEl.innerText = data.message;
-
+        
         if (data.status === 'success') {
+          statusEl.innerHTML = '<i class="bx bx-check-circle"></i> ' + data.message;
           statusEl.className = 'success';
           // Redirect to target URL after 2 seconds
           setTimeout(() => {
             window.location.href = data.redirect_url;
           }, 2000);
         } else {
+          statusEl.innerHTML = '<i class="bx bx-x-circle"></i> ' + data.message;
           statusEl.className = 'error';
         }
       })
       .catch(err => {
-        document.getElementById("status").innerText = "⚠️ Error verifying location: " + err.message;
-        document.getElementById("status").className = 'error';
+        const statusEl = document.getElementById("status");
+        statusEl.innerHTML = '<i class="bx bx-error"></i> Error verifying location: ' + err.message;
+        statusEl.className = 'error';
       });
     }
 
@@ -172,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         err => {
           const statusEl = document.getElementById("status");
           statusEl.className = 'error';
-          statusEl.innerText = "❌ Location permission denied or unavailable.";
+          statusEl.innerHTML = '<i class="bx bx-x-circle"></i> Location permission denied or unavailable.';
         },
         {
           enableHighAccuracy: true,
@@ -183,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       const statusEl = document.getElementById("status");
       statusEl.className = 'error';
-      statusEl.innerText = "❌ Geolocation not supported by your browser.";
+      statusEl.innerHTML = '<i class="bx bx-x-circle"></i> Geolocation not supported by your browser.';
     }
   </script>
 </body>
