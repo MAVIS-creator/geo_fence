@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="small">
               <i class='bx bx-fingerprint'></i> <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | 
               <i class='bx bx-map'></i> <?= htmlspecialchars(number_format((float)$link['lat'],6)) ?>, <?= htmlspecialchars(number_format((float)$link['lng'],6)) ?> | 
-              <i class='bx bx-ruler'></i> <?= htmlspecialchars($link['radius']) ?>m | 
+              <i class='bx bx-ruler'></i> <?= htmlspecialchars((string)$link['radius']) ?>m | 
               <i class='bx bx-time'></i> <?= htmlspecialchars($link['expires']) ?>
             </div>
           </div>
