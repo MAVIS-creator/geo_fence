@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Carbon\Carbon;
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   $url = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http').'://'.$_SERVER['HTTP_HOST']), '/') . '/redirect.php?token=' . $token;
             ?>
             <a href="<?= htmlspecialchars($url) ?>" target="_blank" class="badge" style="text-align:center"><i class='bx bx-link-external'></i> Open Link</a>
-            <a href="<?= htmlspecialchars(generate_qr_code_url($url)) ?>" download="qr-<?= htmlspecialchars(substr($link['id'],0,8)) ?>.png" class="badge" style="text-align:center"><i class='bx bx-qr'></i> QR Code</a>
+            <a href="<?= htmlspecialchars(generate_qr_code_url($url)) ?>" download="qr-<?= htmlspecialchars(substr($link['id'],0,8)) ?>.svg" class="badge" style="text-align:center"><i class='bx bx-qr'></i> QR Code</a>
             <form method="POST" style="margin:0">
               <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
               <input type="hidden" name="action" value="delete">
