@@ -12,10 +12,12 @@ use Monolog\Level;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Carbon\Carbon;
 use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
+use Respect\Validation\Validator as v;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Token\Plain;
 
 // 1) ENV
 $dotenv = Dotenv::createImmutable(__DIR__);
@@ -53,9 +55,6 @@ if (!function_exists('csrf_field')) {
 }
 
 // 7) Validation helpers
-use Respect\Validation\Validator as v;
-use Lcobucci\JWT\Configuration;
-use Lcobucci\JWT\Token\Plain;
 
 if (!function_exists('v_lat')) {
     function v_lat($x){ return v::numericVal()->between(-90, 90)->validate($x); }
@@ -259,13 +258,13 @@ function generate_qr_code_url(string $data): string {
             margin: 10,
             roundBlockSizeMode: RoundBlockSizeMode::Margin
         );
-        
-        $writer = new PngWriter();
+
+        // Prefer SVG to avoid requiring GD extension
+        $writer = new \Endroid\QrCode\Writer\SvgWriter();
         $result = $writer->write($qrCode);
-        
-        // Return as data URI for inline embedding
+
         return $result->getDataUri();
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
         global $logger;
         $logger->error('QR code generation failed', ['error' => $e->getMessage()]);
         // Fallback to external API
