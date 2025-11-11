@@ -86,95 +86,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GPS Attendance - Create Link</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geo-Fence Link Generator</title>
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>#map{height:300px;margin-bottom:1rem}</style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo"><div class="mark">GF</div><div class="title">Geo-Fence Link Generator</div></div>
-    <div class="nav"><a href="dashboard.php">Dashboard</a></div>
-  </div>
-
-  <h1>📍 Create a Geo-Fenced Link</h1>
-
-  <?php if ($errors): ?>
-    <div id="status" style="background:rgba(255,0,0,.25)">
-      <?php foreach($errors as $e) echo "<div>• ".htmlspecialchars($e)."</div>"; ?>
+  <div class="container">
+    <div class="header">
+      <div class="logo"><div class="mark">GF</div><div class="title">Geo-Fence Link Generator</div></div>
+      <div class="nav"><a href="dashboard.php">📊 Dashboard</a></div>
     </div>
-  <?php endif; ?>
 
-  <form method="POST" novalidate>
-    <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
+    <h1>📍 Create a Geo-Fenced Link</h1>
 
-    <div id="map"></div>
+    <?php if ($errors): ?>
+      <div class="card" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3)">
+        <?php foreach($errors as $e) echo "<div>❌ ".htmlspecialchars($e)."</div>"; ?>
+      </div>
+    <?php endif; ?>
 
-    <label>Latitude</label>
-    <input type="text" name="lat" id="lat" readonly required>
+    <form method="POST" novalidate class="card">
+      <input type="hidden" name="_token" value="<?= htmlspecialchars($csrfToken) ?>">
 
-    <label>Longitude</label>
-    <input type="text" name="lng" id="lng" readonly required>
+      <div id="map"></div>
 
-    <label>Radius (meters)</label>
-    <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
+      <label>📍 Latitude</label>
+      <input type="text" name="lat" id="lat" readonly required>
 
-    <label>Target URL (where to redirect if inside fence)</label>
-    <input type="url" name="target_url" placeholder="https://example.com/secret-page" required>
+      <label>📍 Longitude</label>
+      <input type="text" name="lng" id="lng" readonly required>
 
-    <label>Expiry Date/Time</label>
-    <input type="datetime-local" name="expires" required>
+      <label>📏 Radius (meters)</label>
+      <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
 
-    <button type="button" id="useLocation">📡 Use My Live Location</button>
-    <button type="submit">Generate Link</button>
-  </form>
+      <label>🎯 Target URL (where to redirect if inside fence)</label>
+      <input type="url" name="target_url" placeholder="https://example.com/secret-page" required>
 
-  <?php if (!empty($generatedLink)): ?>
-    <div class="card generated">
-      <div style="flex:1">
-        <p><strong>✅ Link Generated:</strong></p>
-        <input id="generatedLink" type="text" value="<?= htmlspecialchars($generatedLink) ?>" readonly style="width:100%">
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="copyLink" class="ghost">Copy Link</button>
-          <a href="<?= htmlspecialchars($generatedLink) ?>" target="_blank"><button>Open Link</button></a>
+      <label>⏰ Expiry Date/Time</label>
+      <input type="datetime-local" name="expires" required>
+
+      <button type="button" id="useLocation">📡 Use My Current Location</button>
+      <button type="submit">🚀 Generate Geo-Fenced Link</button>
+    </form>
+
+    <?php if (!empty($generatedLink)): ?>
+      <div class="card generated">
+        <div style="flex:1">
+          <p style="font-size:1.1rem;margin-bottom:12px"><strong>✅ Link Generated Successfully!</strong></p>
+          <input id="generatedLink" type="text" value="<?= htmlspecialchars($generatedLink) ?>" readonly style="width:100%">
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button type="button" id="copyLink" class="ghost" style="width:auto">📋 Copy Link</button>
+            <a href="<?= htmlspecialchars($generatedLink) ?>" target="_blank" style="flex:1"><button type="button" style="width:100%">🔗 Open Link</button></a>
+          </div>
+        </div>
+        <div class="qr">
+          <img src="<?= htmlspecialchars(generate_qr_code_url($generatedLink)) ?>" alt="QR Code" width="120" height="120">
         </div>
       </div>
-      <div class="qr">
-        <img src="<?= htmlspecialchars(generate_qr_code_url($generatedLink)) ?>" alt="QR" width="120" height="120">
-      </div>
-    </div>
-    <script>
-      document.getElementById('copyLink').addEventListener('click', () => {
-        const el = document.getElementById('generatedLink');
-        navigator.clipboard.writeText(el.value).then(()=>{
-          alert('Link copied to clipboard');
+      <script>
+        document.getElementById('copyLink').addEventListener('click', () => {
+          const el = document.getElementById('generatedLink');
+          navigator.clipboard.writeText(el.value).then(()=>{
+            alert('✅ Link copied to clipboard!');
+          });
         });
-      });
-    </script>
-  <?php endif; ?>
+      </script>
+    <?php endif; ?>
 
-  <h2>Existing Links</h2>
-  <ul>
-    <?php foreach (array_reverse($links) as $link): ?>
-      <?php
-        $token = jwt_sign([
-            'sub'        => 'geo-fence-link',
-            'jti'        => $link['id'],
-            'lat'        => $link['lat'],
-            'lng'        => $link['lng'],
-            'radius'     => $link['radius'],
-            'target_url' => $link['target_url'],
-            'exp'        => strtotime($link['expires'])
-        ]);
-        $url = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http').'://'.$_SERVER['HTTP_HOST']), '/') 
-               . '/redirect.php?token=' . $token;
-      ?>
-      <li>
-        <span>ID: <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | Target: <?= htmlspecialchars($link['target_url']) ?> | Expires: <?= htmlspecialchars($link['expires']) ?></span>
-        <a href="<?= htmlspecialchars($url) ?>" target="_blank">Open</a>
-      </li>
-    <?php endforeach; ?>
-  </ul>
+    <h2>📝 Recent Links</h2>
+    <?php if (empty($links)): ?>
+      <p class="small" style="text-align:center;padding:20px">No links created yet. Generate your first geo-fenced link above!</p>
+    <?php else: ?>
+      <?php foreach (array_reverse($links) as $link): ?>
+        <?php
+          $token = jwt_sign([
+              'sub'        => 'geo-fence-link',
+              'jti'        => $link['id'],
+              'lat'        => $link['lat'],
+              'lng'        => $link['lng'],
+              'radius'     => $link['radius'],
+              'target_url' => $link['target_url'],
+              'exp'        => strtotime($link['expires'])
+          ]);
+          $url = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http').'://'.$_SERVER['HTTP_HOST']), '/') 
+                 . '/redirect.php?token=' . $token;
+        ?>
+        <div class="card link-row">
+          <div>
+            <strong><?= htmlspecialchars($link['target_url']) ?></strong>
+            <div class="small">
+              🆔 <?= htmlspecialchars(substr($link['id'], 0, 8)) ?>… | 
+              📍 <?= htmlspecialchars($link['lat']) ?>, <?= htmlspecialchars($link['lng']) ?> | 
+              📏 <?= htmlspecialchars($link['radius']) ?>m | 
+              ⏰ <?= htmlspecialchars($link['expires']) ?>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="<?= htmlspecialchars($url) ?>" target="_blank" class="badge">🔗 Open</a>
+            <a href="dashboard.php" class="badge">📊 Stats</a>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
@@ -188,18 +203,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (marker) map.removeLayer(marker);
       if (circle) map.removeLayer(circle);
       marker = L.marker([lat, lng]).addTo(map);
-      circle = L.circle([lat, lng], { radius: +document.getElementById('radius').value }).addTo(map);
+      circle = L.circle([lat, lng], { radius: +document.getElementById('radius').value, color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.2 }).addTo(map);
     }
 
     map.on('click', e => setPoint(e.latlng.lat, e.latlng.lng));
     document.getElementById('radius').addEventListener('input', () => { if (circle) circle.setRadius(+radius.value); });
 
     document.getElementById('useLocation').addEventListener('click', () => {
-      if (!navigator.geolocation) return alert('Geolocation not supported.');
+      if (!navigator.geolocation) return alert('❌ Geolocation not supported by your browser.');
+      
+      const btn = document.getElementById('useLocation');
+      btn.textContent = '⏳ Getting location...';
+      btn.disabled = true;
+      
       navigator.geolocation.getCurrentPosition(p => {
         setPoint(p.coords.latitude, p.coords.longitude);
         map.setView([p.coords.latitude, p.coords.longitude], 16);
-      }, () => alert('Unable to get location.'));
+        btn.textContent = '✅ Location Set!';
+        setTimeout(() => {
+          btn.textContent = '📡 Use My Current Location';
+          btn.disabled = false;
+        }, 2000);
+      }, () => {
+        alert('❌ Unable to get your location. Please allow location access.');
+        btn.textContent = '📡 Use My Current Location';
+        btn.disabled = false;
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000
+      });
     });
   </script>
 </body>
