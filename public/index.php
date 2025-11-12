@@ -80,7 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'exp'        => $exp->getTimestamp()
             ]);
 
-            $base = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . $_SERVER['HTTP_HOST']), '/');
+      $base = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . $_SERVER['HTTP_HOST']), '/');
+      // If APP_URL mistakenly contains '/public' (common when tunnelling), strip it so links point to the site root
+      if (str_ends_with($base, '/public')) {
+        $base = substr($base, 0, -7);
+      }
             $generatedLink = "{$base}/redirect.php?token={$token}";
 
             $logger->info('Link created', $record);
