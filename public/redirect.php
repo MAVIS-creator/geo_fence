@@ -187,7 +187,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         err => {
           const statusEl = document.getElementById("status");
           statusEl.className = 'error';
-          statusEl.innerHTML = '<i class="bx bx-x-circle"></i> Location permission denied or unavailable.';
+          
+          // Provide specific error messages based on error code
+          let message = '';
+          switch(err.code) {
+            case err.PERMISSION_DENIED:
+              message = '<i class="bx bx-block"></i> <strong>Location Access Denied</strong><br><span class="small">Please enable location permissions in your browser settings and refresh this page.</span>';
+              break;
+            case err.POSITION_UNAVAILABLE:
+              message = '<i class="bx bx-error-circle"></i> <strong>Location Unavailable</strong><br><span class="small">Your device cannot determine your location right now. Please check your GPS/location services and try again.</span>';
+              break;
+            case err.TIMEOUT:
+              message = '<i class="bx bx-time"></i> <strong>Location Request Timed Out</strong><br><span class="small">Taking too long to get your location. Please check your connection and try again.</span>';
+              break;
+            default:
+              message = '<i class="bx bx-x-circle"></i> <strong>Location Error</strong><br><span class="small">Unable to access your location. Please ensure location services are enabled.</span>';
+          }
+          statusEl.innerHTML = message;
         },
         {
           enableHighAccuracy: true,
@@ -198,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       const statusEl = document.getElementById("status");
       statusEl.className = 'error';
-      statusEl.innerHTML = '<i class="bx bx-x-circle"></i> Geolocation not supported by your browser.';
+      statusEl.innerHTML = '<i class="bx bx-error"></i> <strong>Geolocation Not Supported</strong><br><span class="small">Your browser does not support location services. Please use a modern browser.</span>';
     }
   </script>
 </body>
