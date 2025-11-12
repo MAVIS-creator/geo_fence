@@ -1,1 +1,19 @@
-[]
+{
+    "688591d7-ab3e-41c4-93d5-6f860b30f66f": {
+        "total_attempts": 1,
+        "successful_access": 1,
+        "failed_access": 0,
+        "first_access": "2025-11-12T20:22:43+00:00",
+        "last_access": "2025-11-12T20:22:43+00:00",
+        "access_log": [
+            {
+                "timestamp": "2025-11-12T20:22:43+00:00",
+                "success": true,
+                "ip": "105.113.90.97",
+                "user_lat": 8.159979,
+                "user_lng": 4.258368,
+                "distance": 0
+            }
+        ]
+    }
+}
