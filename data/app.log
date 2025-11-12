@@ -154,3 +154,5 @@
 [2025-11-12T20:38:58.783824+00:00] gps_attendance.INFO: Bootstrap loaded [] []
 [2025-11-12T20:38:58.829105+00:00] gps_attendance.INFO: Access tracked {"link_id":"57da127b-f0f8-4d68-a8be-c0c8963389a4","success":false} []
 [2025-11-12T20:38:58.829182+00:00] gps_attendance.WARNING: Geo-fence access denied {"link_id":"57da127b-f0f8-4d68-a8be-c0c8963389a4","user_lat":"8.141182","user_lng":"4.248120","distance":2330.47,"required_radius":100} []
+[2025-11-12T20:44:40.278941+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-12T20:44:40.280848+00:00] gps_attendance.INFO: Bootstrap loaded [] []
