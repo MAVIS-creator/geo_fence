@@ -15,5 +15,22 @@
                 "distance": 0
             }
         ]
+    },
+    "57da127b-f0f8-4d68-a8be-c0c8963389a4": {
+        "total_attempts": 1,
+        "successful_access": 0,
+        "failed_access": 1,
+        "first_access": "2025-11-12T20:38:58+00:00",
+        "last_access": "2025-11-12T20:38:58+00:00",
+        "access_log": [
+            {
+                "timestamp": "2025-11-12T20:38:58+00:00",
+                "success": false,
+                "ip": "105.113.112.22",
+                "user_lat": 8.141182,
+                "user_lng": 4.24812,
+                "distance": 2330.47
+            }
+        ]
     }
 }
