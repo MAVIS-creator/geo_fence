@@ -2,9 +2,6 @@
 require __DIR__ . '/../bootstrap.php';
 
 $base = rtrim($_ENV['APP_URL'] ?? (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')), '/');
-if (str_ends_with($base, '/public')) {
-    $base = substr($base, 0, -7);
-}
 
 $claims = [
     'sub'        => 'geo-fence-link',
