@@ -21,24 +21,41 @@ try {
     die("❌ Invalid or tampered token.");
 }
 
-// Check expiration
-if (isset($claims['exp']) && $claims['exp'] < time()) {
+// Check expiration (handle DateTimeImmutable or int)
+if (isset($claims['exp'])) {
+  $expTs = null;
+  if ($claims['exp'] instanceof \DateTimeInterface) {
+    $expTs = $claims['exp']->getTimestamp();
+  } elseif (is_numeric($claims['exp'])) {
+    $expTs = (int)$claims['exp'];
+  } elseif (is_string($claims['exp'])) {
+    $ts = strtotime($claims['exp']);
+    if ($ts !== false) { $expTs = $ts; }
+  }
+  if ($expTs !== null && $expTs < time()) {
     http_response_code(410);
     $logger->info('Expired token accessed', ['jti' => $claims['jti'] ?? 'unknown']);
     die("❌ This link has expired.");
+  }
 }
 
 // Extract geo-fence data
 $targetLat = $claims['lat'] ?? null;
 $targetLng = $claims['lng'] ?? null;
-$radius = $claims['radius'] ?? null;
+$radius    = $claims['radius'] ?? null;
 $targetUrl = $claims['target_url'] ?? null;
 $linkId = $claims['jti'] ?? 'unknown';
 
-if (!$targetLat || !$targetLng || !$radius || !$targetUrl) {
+// Validate presence without treating 0 as false
+if ($targetLat === null || $targetLng === null || $radius === null || !$targetUrl) {
     http_response_code(400);
     die("❌ Malformed token data.");
 }
+
+// Cast to proper types
+$targetLat = (float)$targetLat;
+$targetLng = (float)$targetLng;
+$radius    = (int)$radius;
 
 // Handle AJAX location verification
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $userLat = $_POST['lat'] ?? null;
   $userLng = $_POST['lng'] ?? null;
 
-  if (!$userLat || !$userLng) {
+  if ($userLat === null || $userLng === null || $userLat === '' || $userLng === '' || !is_numeric($userLat) || !is_numeric($userLng)) {
     echo json_encode(['status' => 'error', 'message' => 'Missing location data']);
     exit;
   }
@@ -64,12 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Calculate distance using haversine
-  $distance = haversine(
-    (float)$targetLat,
-    (float)$targetLng,
-    (float)$userLat,
-    (float)$userLng
-  );
+  $distance = haversine($targetLat, $targetLng, (float)$userLat, (float)$userLng);
 
   $success = $distance <= $radius;
 
@@ -109,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     echo json_encode([
       'status' => 'error',
-      'message' => "❌ You're {" . round($distance,2) . "}m away. Must be within {$radius}m."
+      'message' => "❌ You're " . round($distance,2) . "m away. Must be within {$radius}m."
     ]);
   }
   exit;
