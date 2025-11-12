@@ -104,3 +104,7 @@
 [2025-11-12T19:54:31.210452+00:00] gps_attendance.INFO: Link created {"id":"7b4a95a9-59d4-4e0f-9f79-75b6213ac913","lat":8.1596,"lng":4.25867,"radius":100,"target_url":"https://www.google.com","expires":"2025-11-12T20:59:00+00:00","created":"2025-11-12T19:54:31+00:00"} []
 [2025-11-12T20:03:49.885153+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
 [2025-11-12T20:03:49.892160+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-12T20:05:00.273186+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-12T20:05:00.276241+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-12T20:05:23.345177+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-12T20:05:23.347567+00:00] gps_attendance.INFO: Bootstrap loaded [] []
