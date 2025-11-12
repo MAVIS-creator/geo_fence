@@ -21,22 +21,11 @@ try {
     die("❌ Invalid or tampered token.");
 }
 
-// Check expiration (handle DateTimeInterface or timestamp)
-if (isset($claims['exp'])) {
-  $expVal = $claims['exp'];
-  if ($expVal instanceof \DateTimeInterface) {
-    $expTs = $expVal->getTimestamp();
-  } elseif (is_numeric($expVal)) {
-    $expTs = (int)$expVal;
-  } else {
-    $expTs = null;
-  }
-
-  if ($expTs !== null && $expTs < time()) {
+// Check expiration
+if (isset($claims['exp']) && $claims['exp'] < time()) {
     http_response_code(410);
     $logger->info('Expired token accessed', ['jti' => $claims['jti'] ?? 'unknown']);
     die("❌ This link has expired.");
-  }
 }
 
 // Extract geo-fence data
