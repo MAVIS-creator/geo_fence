@@ -97,3 +97,8 @@
 [2025-11-11T22:18:38.608764+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
 [2025-11-11T22:18:38.611355+00:00] gps_attendance.INFO: Bootstrap loaded [] []
 [2025-11-11T22:18:38.622107+00:00] gps_attendance.INFO: Expired token accessed {"jti":"1326e9f5-8d70-4530-b0a9-dde848aa6da7"} []
+[2025-11-12T19:53:06.874938+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-12T19:53:06.879420+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-12T19:54:31.107899+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-12T19:54:31.109413+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-12T19:54:31.210452+00:00] gps_attendance.INFO: Link created {"id":"7b4a95a9-59d4-4e0f-9f79-75b6213ac913","lat":8.1596,"lng":4.25867,"radius":100,"target_url":"https://www.google.com","expires":"2025-11-12T20:59:00+00:00","created":"2025-11-12T19:54:31+00:00"} []
