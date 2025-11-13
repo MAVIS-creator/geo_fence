@@ -110,15 +110,13 @@ if (!function_exists('dms_to_decimal')) {
 if (!function_exists('pluscode_to_decimal')) {
     function pluscode_to_decimal(string $plusCode): ?array {
         try {
-            $olc = new \OpenLocationCode\OpenLocationCode();
-            
             // Validate the Plus Code
-            if (!$olc->isValid($plusCode)) {
+            if (!\OpenLocationCode\OpenLocationCode::isValid($plusCode)) {
                 return null;
             }
             
             // Decode to get the center coordinates
-            $decoded = $olc->decode($plusCode);
+            $decoded = \OpenLocationCode\OpenLocationCode::decode($plusCode);
             
             return [
                 'lat' => $decoded->latitudeCenter,
