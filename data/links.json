@@ -70,5 +70,23 @@
         "target_url": "https://www.google.com",
         "expires": "2025-11-12T22:30:00+00:00",
         "created": "2025-11-12T20:47:48+00:00"
+    },
+    {
+        "id": "e182a774-7357-4622-af4e-60c09fdbd923",
+        "lat": 8.165803,
+        "lng": 4.265737,
+        "radius": 100,
+        "target_url": "https://www.google.com",
+        "expires": "2025-11-13T09:20:00+00:00",
+        "created": "2025-11-13T08:11:40+00:00"
+    },
+    {
+        "id": "368a337a-e913-4975-add6-fdea9269596b",
+        "lat": 8.165803,
+        "lng": 4.265737,
+        "radius": 100,
+        "target_url": "https://www.google.com",
+        "expires": "2025-11-13T09:20:00+00:00",
+        "created": "2025-11-13T08:11:42+00:00"
     }
 ]
