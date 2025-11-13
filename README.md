@@ -47,31 +47,30 @@
 | **Extensions** | `sodium`, `json`, `curl` |
 | **Server** | Apache / Nginx / PHP built-in server |
 
+---
+
 ## 🛠️ Installation
 
-### 1. Clone or Download
-
+### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/MAVIS-creator/geo_fence.git
 cd geo_fence
 ```
 
-### 2. Install Dependencies
-
+### 2️⃣ Install Dependencies
 ```bash
 composer install
 ```
 
-### 3. Enable PHP Sodium Extension
+### 3️⃣ Enable Sodium Extension
+In your `php.ini`:
 
-Edit your `php.ini` file and uncomment:
 ```ini
 extension=sodium
 ```
 
-### 4. Configure Environment
-
-The `.env` file is already set up with defaults:
+### 4️⃣ Configure Environment
+Edit your `.env`:
 
 ```env
 APP_URL=http://localhost:8000
@@ -79,61 +78,53 @@ TIMEZONE=UTC
 JWT_SECRET=your-secret-key
 RATE_LIMIT_MAX=15
 RATE_LIMIT_WINDOW=60
-NOTIFICATION_EMAIL=  # Optional: your@email.com
+NOTIFICATION_EMAIL= # optional
 ```
 
-### 5. Set Permissions
-
+### 5️⃣ Set Permissions
 ```bash
 chmod -R 755 data/
 ```
 
-### 6. Start Development Server
-
+### 6️⃣ Start the Dev Server
 ```bash
 php -S localhost:8000 -t public
 ```
 
-Visit: `http://localhost:8000`
+👉 **Visit:** `http://localhost:8000`
 
-## 📖 Usage Guide
+---
 
-### Creating a Geo-Fenced Link
+## 🧭 Usage Guide
 
-1. **Navigate to** `http://localhost:8000/index.php`
-2. **Set Location** - Click on the map or use "Use My Current Location"
-3. **Set Radius** - Define the allowed area (5-2000 meters)
-4. **Enter Target URL** - Where users will be redirected if inside the fence
-5. **Set Expiry** - Choose when the link should expire
-6. **Generate** - Get your shareable link and QR code!
+### ✨ Create a Geo-Fenced Link
 
-### How It Works
+1. Go to `http://localhost:8000/index.php`
+2. Click **Use My Location** or pick manually on map
+3. Set **radius** (5-2000m)
+4. Enter **target URL**
+5. Set **expiry time**
+6. Hit **Generate** → You'll get a shareable link + QR code 🎉
 
-1. **Admin creates link:**
-   - Enters target URL, GPS coordinates, radius, and expiry
-   - System generates JWT token with geo-fence data
-   - Returns shareable link: `https://yourdomain.com/redirect.php?token=...`
+### 🧩 How It Works
 
-2. **User clicks link:**
-   - Browser requests location permission
-   - System verifies JWT signature and expiration
-   - Calculates distance using Haversine formula
-   - **If inside fence** → Redirects to target URL ✅
-   - **If outside fence** → Shows error with distance ❌
+1. **Admin creates link** → system generates JWT token
+2. **User opens link** → browser requests location
+3. **Backend verifies:**
+   - ✅ Inside geofence → redirect
+   - ❌ Outside → blocked with distance message
+4. **All access attempts logged** → view analytics in dashboard
 
-3. **Analytics tracked:**
-   - Every access attempt is logged
-   - Dashboard shows success/fail statistics
-   - Optional email notifications sent
+---
 
-## 🏗️ Architecture
+## 🏗️ Architecture Overview
 
 ### Tech Stack
 
 | Feature | Technology |
 |---------|------------|
-| Framework | Pure PHP (no framework) |
-| Environment | `vlucas/phpdotenv` |
+| Framework | Native PHP |
+| Env Config | `vlucas/phpdotenv` |
 | Validation | `respect/validation` |
 | Security | `symfony/security-csrf` |
 | Tokens | `lcobucci/jwt` |
