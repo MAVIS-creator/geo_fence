@@ -50,6 +50,10 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
             'Psr\\Clock\\' => 10,
             'PhpOption\\' => 10,
         ),
+        'O' => 
+        array (
+            'OpenLocationCode\\' => 17,
+        ),
         'M' => 
         array (
             'Monolog\\' => 8,
@@ -175,6 +179,10 @@ class ComposerStaticInitb5cc7e0501b726d394f9ad04266537ff
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
+        ),
+        'OpenLocationCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/c3t4r4/openlocationcode/src',
         ),
         'Monolog\\' => 
         array (
