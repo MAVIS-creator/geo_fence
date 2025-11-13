@@ -116,11 +116,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div id="map"></div>
 
-      <label><i class='bx bx-map-pin'></i> Latitude</label>
-      <input type="text" name="lat" id="lat" placeholder="e.g., 6.5244" required>
+      <div style="margin-bottom:16px">
+        <label><i class='bx bx-current-location'></i> Coordinate Format</label>
+        <select id="coordFormat" style="margin-bottom:8px">
+          <option value="decimal">Decimal Degrees (e.g., 8.1656, 4.2658)</option>
+          <option value="dms">DMS (e.g., 8°09'56.6"N 4°15'56.9"E)</option>
+          <option value="pluscode">Plus Code (e.g., 6FRR5274+P6)</option>
+        </select>
+      </div>
 
-      <label><i class='bx bx-map-pin'></i> Longitude</label>
-      <input type="text" name="lng" id="lng" placeholder="e.g., 3.3792" required>
+      <div id="decimalInputs">
+        <label><i class='bx bx-map-pin'></i> Latitude</label>
+        <input type="text" name="lat" id="lat" placeholder="e.g., 6.5244" required>
+
+        <label><i class='bx bx-map-pin'></i> Longitude</label>
+        <input type="text" name="lng" id="lng" placeholder="e.g., 3.3792" required>
+      </div>
+
+      <div id="dmsInputs" style="display:none">
+        <label><i class='bx bx-map-pin'></i> Latitude (DMS)</label>
+        <input type="text" id="dmsLat" placeholder='e.g., 8°09\'56.6"N'>
+        
+        <label><i class='bx bx-map-pin'></i> Longitude (DMS)</label>
+        <input type="text" id="dmsLng" placeholder='e.g., 4°15\'56.9"E'>
+      </div>
+
+      <div id="pluscodeInputs" style="display:none">
+        <label><i class='bx bx-map-pin'></i> Plus Code</label>
+        <input type="text" id="plusCode" placeholder="e.g., 6FRR5274+P6">
+      </div>
 
       <label><i class='bx bx-ruler'></i> Radius (meters)</label>
       <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
