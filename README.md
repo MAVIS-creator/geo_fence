@@ -233,89 +233,115 @@ Then add:
 JWT_SECRET=your-generated-secret
 ```
 
+---
+
 ## 📊 Dashboard Features
 
-Access at `http://localhost:8000/dashboard.php`:
+Access: `http://localhost:8000/dashboard.php`
 
-- 📈 Overall statistics (total attempts, success rate)
-- 📋 List all generated links
-- 🔍 Per-link analytics
-- 🗑️ Delete expired/unwanted links
-- 📱 Download QR codes
-- 🔗 Quick link access
+- 📈 View total & per-link analytics
+- 🗑️ Delete expired links
+- � Copy links / download QR codes
+- � Real-time stats
 
-## 🔧 Customization
+---
 
-### Change UI Theme
+## 🎨 Customization
 
-Edit `public/assets/style.css` variables:
+### Theme Colors
+
+In `public/assets/style.css`:
 
 ```css
 :root {
   --bg-primary: #0a0e27;
   --accent-purple: #7c3aed;
   --accent-blue: #3b82f6;
-  /* ... customize colors */
 }
 ```
 
-### Adjust Geo-Fence Limits
+### Radius Validation
 
-Edit `bootstrap.php`:
+In `bootstrap.php`:
 
 ```php
-function v_radius($x){ 
-  return v::intVal()->between(5, 5000)->validate($x); 
+function v_radius($x){
+  return v::intVal()->between(5, 5000)->validate($x);
 }
 ```
-
-## 🐛 Troubleshooting
-
-### "SSL certificate problem" during composer install
-
-**Solution:**
-```bash
-# Enable sodium extension
-# Edit php.ini and uncomment: extension=sodium
-
-# Then:
-composer install --ignore-platform-reqs
-```
-
-### Location not working
-
-- Ensure HTTPS (browsers require secure context for geolocation)
-- Check browser location permissions
-- Test on `localhost` (allowed without HTTPS)
-
-### QR codes not generating
-
-Check logs in `data/app.log` for errors. Fallback to external API is automatic.
-
-## 📝 License
-
-MIT License - Feel free to use in your projects!
-
-## 🤝 Contributing
-
-Contributions welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-
-## 🙏 Credits
-
-Built with ❤️ by MAVIS-creator
-
-Uses these amazing open-source libraries:
-- Leaflet.js for maps
-- Composer packages (see composer.json)
 
 ---
 
-**Note:** This is designed for development/demonstration. For production:
-- Use a proper database (MySQL/PostgreSQL)
-- Configure SMTP for email
-- Enable HTTPS
-- Add user authentication
-- Implement backup strategy
+## 🧰 Troubleshooting
+
+### ❌ Invalid Plus Code
+
+Make sure you use just the code, e.g.:
+
+```
+6FRR5274+P6
+```
+
+(not with the place name).
+
+### 🌐 Location Not Working
+
+- Enable HTTPS or test on `localhost`
+- Allow browser location permission
+- Check dev console logs
+
+### 🧾 QR Code Not Generating
+
+See `data/app.log`. Fallback API will auto-trigger if local generation fails.
+
+---
+
+## 📝 License
+
+**MIT License** — free to use and modify 💖
+
+---
+
+## 🤝 Contributing
+
+PRs, bug reports, and ideas are always welcome!  
+Let's build more cool geospatial tools together 🧭
+
+---
+
+## 👨‍� Author
+
+<p align="center">
+  <strong>Built with ❤️ by <a href="https://github.com/MAVIS-creator">MAVIS-creator</a></strong><br>
+  Powered by open-source tech and a passion for geolocation innovation 🌍
+</p>
+
+---
+
+## 🙏 Credits
+
+**Uses these amazing open-source libraries:**
+
+- **Leaflet.js** for interactive maps
+- **Composer packages** (see `composer.json` for full list)
+- **c3t4r4/openlocationcode** for Plus Code support
+
+---
+
+## 📌 Production Notes
+
+This is designed for development/demonstration. For production:
+
+- ✅ Use a proper database (MySQL/PostgreSQL)
+- ✅ Configure SMTP for reliable email
+- ✅ Enable HTTPS everywhere
+- ✅ Add user authentication system
+- ✅ Implement backup & monitoring strategy
+- ✅ Consider CDN for static assets
+
+---
+
+<p align="center">
+  <strong>⭐ Star this repo if you find it useful!</strong><br>
+  <em>Made with geospatial magic ✨</em>
+</p>
