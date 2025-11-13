@@ -117,10 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div id="map"></div>
 
       <label><i class='bx bx-map-pin'></i> Latitude</label>
-      <input type="text" name="lat" id="lat" placeholder="e.g., 6.5244" required>
+      <input type="text" name="lat" id="lat" placeholder="e.g., 6.5244 or 8°09'56.6&quot;N" required>
 
       <label><i class='bx bx-map-pin'></i> Longitude</label>
-      <input type="text" name="lng" id="lng" placeholder="e.g., 3.3792" required>
+      <input type="text" name="lng" id="lng" placeholder="e.g., 3.3792 or 4°15'56.9&quot;E" required>
 
       <label><i class='bx bx-ruler'></i> Radius (meters)</label>
       <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
