@@ -44,9 +44,14 @@ Traditional navigation format with N/S/E/W directions.
 Google's open-source location encoding system. Find Plus Codes on Google Maps!
 
 **Examples:**
-- `6FRR5274+P6` (Lagos area)
-- `87G8Q23M+3M` (New York)
-- `4RRH4R9R+6H` (Sydney)
+- `6FRR5274+P6` (Full code - Lagos area)
+- `87G8Q23M+3M` (Full code - New York)
+- `4RRH4R9R+6H` (Full code - Sydney)
+- `5274+P6` (Short code - requires nearby reference location)
+
+**Full vs Short Codes:**
+- **Full codes** (8+ characters): Can be used anywhere, no reference needed
+- **Short codes** (4-7 characters): Require a nearby reference location to recover the full code
 
 **How to get a Plus Code:**
 1. Open Google Maps
@@ -55,10 +60,13 @@ Google's open-source location encoding system. Find Plus Codes on Google Maps!
 4. Scroll down to see the Plus Code
 5. Copy it and paste here!
 
+**Note:** The system automatically detects short codes and will ask for a reference location if needed.
+
 **How to use:**
 1. Select "Plus Code" from the format dropdown
 2. Enter the complete Plus Code (including the + symbol)
-3. Tab out or click away to convert and update the map
+3. For short codes, the system uses your current map view as reference
+4. Tab out or click away to convert and update the map
 
 ---
 
