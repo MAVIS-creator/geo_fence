@@ -117,10 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div id="map"></div>
 
       <label><i class='bx bx-map-pin'></i> Latitude</label>
-      <input type="text" name="lat" id="lat" readonly required>
+      <input type="text" name="lat" id="lat" placeholder="e.g., 6.5244" required>
 
       <label><i class='bx bx-map-pin'></i> Longitude</label>
-      <input type="text" name="lng" id="lng" readonly required>
+      <input type="text" name="lng" id="lng" placeholder="e.g., 3.3792" required>
 
       <label><i class='bx bx-ruler'></i> Radius (meters)</label>
       <input type="number" name="radius" id="radius" value="100" min="5" max="2000" required>
@@ -244,6 +244,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   document.getElementById('radius').addEventListener('input', () => {
     if (circle) circle.setRadius(+document.getElementById('radius').value || 100);
   });
+
+  // Listen for manual lat/lng input changes and update map
+  const latInput = document.getElementById('lat');
+  const lngInput = document.getElementById('lng');
+  
+  function updateMapFromInputs() {
+    const lat = parseFloat(latInput.value);
+    const lng = parseFloat(lngInput.value);
+    
+    // Validate coordinates
+    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      // Update marker and circle
+      if (marker) map.removeLayer(marker);
+      if (circle) map.removeLayer(circle);
+      
+      marker = L.marker([lat, lng]).addTo(map);
+      const radius = +document.getElementById('radius').value || 100;
+      circle = L.circle([lat, lng], {
+        radius,
+        color: '#7c3aed',
+        fillColor: '#7c3aed',
+        fillOpacity: 0.2
+      }).addTo(map);
+      
+      // Center map on the new location
+      map.setView([lat, lng], 16);
+    }
+  }
+  
+  latInput.addEventListener('change', updateMapFromInputs);
+  lngInput.addEventListener('change', updateMapFromInputs);
+  latInput.addEventListener('blur', updateMapFromInputs);
+  lngInput.addEventListener('blur', updateMapFromInputs);
 
   // High-accuracy "Use My Location" button
   document.getElementById('useLocation').addEventListener('click', () => {
