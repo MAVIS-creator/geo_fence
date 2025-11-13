@@ -219,3 +219,5 @@
 [2025-11-13T11:17:19.939651+00:00] gps_attendance.INFO: Bootstrap loaded [] []
 [2025-11-13T11:20:44.101067+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
 [2025-11-13T11:20:44.104128+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-13T11:21:41.916625+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-13T11:21:41.921816+00:00] gps_attendance.INFO: Bootstrap loaded [] []
