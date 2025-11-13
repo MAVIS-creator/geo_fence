@@ -246,3 +246,6 @@
 [2025-11-13T11:57:52.071533+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
 [2025-11-13T11:57:52.076369+00:00] gps_attendance.INFO: Bootstrap loaded [] []
 [2025-11-13T11:57:52.139661+00:00] gps_attendance.WARNING: Short Plus Code requires reference location {"code":"5274+P6"} []
+[2025-11-13T11:58:49.723019+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-13T11:58:49.725802+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-13T11:58:49.733655+00:00] gps_attendance.WARNING: Short Plus Code requires reference location {"code":"5274+P6"} []
