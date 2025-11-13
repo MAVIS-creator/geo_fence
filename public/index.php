@@ -205,133 +205,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    const mapEl = document.getElementById('map');
-    if (mapEl) {
-      const map = L.map('map').setView([6.5244, 3.3792], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-      let marker, circle;
+ <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const mapEl = document.getElementById('map');
+  if (!mapEl) throw new Error('Map element not found.');
 
-      function setPoint(lat, lng) {
-        document.getElementById('lat').value = lat.toFixed(6);
-        document.getElementById('lng').value = lng.toFixed(6);
-        if (marker) map.removeLayer(marker);
-        if (circle) map.removeLayer(circle);
-        marker = L.marker([lat, lng]).addTo(map);
-        circle = L.circle([lat, lng], { radius: +document.getElementById('radius').value, color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.2 }).addTo(map);
-      }
+  // Initialize map
+  const map = L.map('map').setView([6.5244, 3.3792], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-      map.on('click', e => setPoint(e.latlng.lat, e.latlng.lng));
-      document.getElementById('radius').addEventListener('input', () => { if (circle) circle.setRadius(+radius.value); });
+  let marker = null;
+  let circle = null;
 
-      document.getElementById('useLocation').addEventListener('click', () => {
-        if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
-        const btn = document.getElementById('useLocation');
-        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting precise location...';
-        btn.disabled = true;
-        
-        // Try to get high accuracy position multiple times for better precision
-        let attempts = 0;
-        const maxAttempts = 3;
-        let bestAccuracy = Infinity;
-        let bestPosition = null;
-        
-        function tryGetPosition() {
-          navigator.geolocation.getCurrentPosition(p => {
-            attempts++;
-            if (p.coords.accuracy < bestAccuracy) {
-              bestAccuracy = p.coords.accuracy;
-              bestPosition = p;
-            }
-            
-            // Show accuracy feedback
-            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Accuracy: ' + Math.round(p.coords.accuracy) + 'm (attempt ' + attempts + '/' + maxAttempts + ')';
-            
-            if (attempts < maxAttempts && p.coords.accuracy > 20) {
-              // Try again if accuracy is poor
-              setTimeout(tryGetPosition, 1000);
-            } else {
-              // Use best position found
-              setPoint(bestPosition.coords.latitude, bestPosition.coords.longitude);
-              map.setView([bestPosition.coords.latitude, bestPosition.coords.longitude], 18);
-              btn.innerHTML = '<i class="bx bx-check"></i> Location Set! (±' + Math.round(bestAccuracy) + 'm)';
-              setTimeout(() => { 
-                btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location'; 
-                btn.disabled = false; 
-              }, 3000);
-            }
-          }, (err) => {
-            alert('Unable to get your location. Please ensure GPS is enabled and allow location access.');
+  // Function to set marker + circle and update input fields
+  function setPoint(lat, lng) {
+    document.getElementById('lat').value = lat.toFixed(6);
+    document.getElementById('lng').value = lng.toFixed(6);
+
+    if (marker) map.removeLayer(marker);
+    if (circle) map.removeLayer(circle);
+
+    marker = L.marker([lat, lng]).addTo(map);
+    const radius = +document.getElementById('radius').value || 100;
+    circle = L.circle([lat, lng], {
+      radius,
+      color: '#7c3aed',
+      fillColor: '#7c3aed',
+      fillOpacity: 0.2
+    }).addTo(map);
+  }
+
+  // Click on map to set location
+  map.on('click', e => setPoint(e.latlng.lat, e.latlng.lng));
+
+  // Update circle radius when input changes
+  document.getElementById('radius').addEventListener('input', () => {
+    if (circle) circle.setRadius(+document.getElementById('radius').value || 100);
+  });
+
+  // High-accuracy "Use My Location" button
+  document.getElementById('useLocation').addEventListener('click', () => {
+    if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
+
+    const btn = document.getElementById('useLocation');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting precise location...';
+
+    let attempts = 0;
+    let bestAccuracy = Infinity;
+    let bestPosition = null;
+    const maxAttempts = 3;
+
+    function tryPosition() {
+      navigator.geolocation.getCurrentPosition(pos => {
+        attempts++;
+        if (pos.coords.accuracy < bestAccuracy) {
+          bestAccuracy = pos.coords.accuracy;
+          bestPosition = pos;
+        }
+
+        btn.innerHTML = `<i class="bx bx-loader-alt bx-spin"></i> Accuracy: ${Math.round(pos.coords.accuracy)}m (attempt ${attempts}/${maxAttempts})`;
+
+        if (attempts < maxAttempts && pos.coords.accuracy > 20) {
+          setTimeout(tryPosition, 1000);
+        } else {
+          setPoint(bestPosition.coords.latitude, bestPosition.coords.longitude);
+          map.setView([bestPosition.coords.latitude, bestPosition.coords.longitude], 18);
+          btn.innerHTML = `<i class="bx bx-check"></i> Location Set! (±${Math.round(bestAccuracy)}m)`;
+          setTimeout(() => {
             btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
             btn.disabled = false;
-          }, { 
-            enableHighAccuracy: true, 
-            timeout: 15000,
-            maximumAge: 0
-          });
+          }, 3000);
         }
-        
-        tryGetPosition();
-      });
-    }
-
-    // URL normalization hint
-    const urlInput = document.getElementById('target_url');
-    const urlHint = document.getElementById('urlHint');
-    function updateUrlHint() {
-      const raw = urlInput.value.trim();
-      if (!raw) { urlHint.textContent = ''; return; }
-      let normalized = raw;
-      if (!/^https?:\/\//i.test(raw)) {
-        if (/^www\./i.test(raw) || /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/.*)?$/.test(raw)) {
-          normalized = 'https://' + raw.replace(/^https?:\/\//i,'');
-        }
-      }
-      urlHint.innerHTML = '<i class="bx bx-info-circle"></i> Normalized: <code style="color:var(--accent-cyan)">' + normalized.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</code>';
-    }
-    urlInput.addEventListener('input', updateUrlHint);
-    urlInput.addEventListener('blur', updateUrlHint);
-    updateUrlHint();
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
-    let marker, circle;
-
-    function setPoint(lat, lng) {
-      document.getElementById('lat').value = lat.toFixed(6);
-      document.getElementById('lng').value = lng.toFixed(6);
-      if (marker) map.removeLayer(marker);
-      if (circle) map.removeLayer(circle);
-      marker = L.marker([lat, lng]).addTo(map);
-      circle = L.circle([lat, lng], { radius: +document.getElementById('radius').value, color: '#7c3aed', fillColor: '#7c3aed', fillOpacity: 0.2 }).addTo(map);
-    }
-
-    map.on('click', e => setPoint(e.latlng.lat, e.latlng.lng));
-    document.getElementById('radius').addEventListener('input', () => { if (circle) circle.setRadius(+radius.value); });
-
-    document.getElementById('useLocation').addEventListener('click', () => {
-      if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
-      
-      const btn = document.getElementById('useLocation');
-      btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting location...';
-      btn.disabled = true;
-      
-      navigator.geolocation.getCurrentPosition(p => {
-        setPoint(p.coords.latitude, p.coords.longitude);
-        map.setView([p.coords.latitude, p.coords.longitude], 16);
-        btn.innerHTML = '<i class="bx bx-check"></i> Location Set!';
-        setTimeout(() => {
-          btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
-          btn.disabled = false;
-        }, 2000);
-      }, () => {
-        alert('Unable to get your location. Please allow location access.');
+      }, err => {
+        alert('Unable to get location. Ensure GPS is enabled and location access is allowed.');
         btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
         btn.disabled = false;
       }, {
         enableHighAccuracy: true,
-        timeout: 10000
+        timeout: 15000,
+        maximumAge: 0
       });
-    });
-  </script>
+    }
+
+    tryPosition();
+  });
+
+  // Optional: URL normalization hint
+  const urlInput = document.getElementById('target_url');
+  const urlHint = document.getElementById('urlHint');
+  function updateUrlHint() {
+    const raw = urlInput.value.trim();
+    if (!raw) { urlHint.textContent = ''; return; }
+    let normalized = raw;
+    if (!/^https?:\/\//i.test(raw)) {
+      if (/^www\./i.test(raw) || /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/.*)?$/.test(raw)) {
+        normalized = 'https://' + raw.replace(/^https?:\/\//i,'');
+      }
+    }
+    urlHint.innerHTML = '<i class="bx bx-info-circle"></i> Normalized: <code style="color:var(--accent-cyan)">' 
+                        + normalized.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</code>';
+  }
+  urlInput.addEventListener('input', updateUrlHint);
+  urlInput.addEventListener('blur', updateUrlHint);
+  updateUrlHint();
+</script>
+
 </body>
 </html>
