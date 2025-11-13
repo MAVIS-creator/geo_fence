@@ -104,13 +104,38 @@ if (!function_exists('dms_to_decimal')) {
 
 /**
  * Convert Plus Code (Open Location Code) to Decimal Degrees
- * Example: 6FRR5274+P6 → ['lat' => 8.1643, 'lng' => 4.2559]
- * Returns: ['lat' => float, 'lng' => float] or null on failure
+ * Supports both full codes and short codes with reference location
+ * 
+ * Examples:
+ * - Full code: 6FRR5274+P6 → ['lat' => 8.1643, 'lng' => 4.2559]
+ * - Short code: 5274+P6 with reference 8.16, 4.26 → ['lat' => 8.1643, 'lng' => 4.2559]
+ * 
+ * @param string $plusCode The Plus Code to decode
+ * @param float|null $refLat Reference latitude for short codes (optional)
+ * @param float|null $refLng Reference longitude for short codes (optional)
+ * @return array|null ['lat' => float, 'lng' => float] or null on failure
  */
 if (!function_exists('pluscode_to_decimal')) {
-    function pluscode_to_decimal(string $plusCode): ?array {
+    function pluscode_to_decimal(string $plusCode, ?float $refLat = null, ?float $refLng = null): ?array {
         try {
-            // Validate the Plus Code
+            // Check if it's a short code (missing area prefix)
+            $isShort = \OpenLocationCode\OpenLocationCode::isShort($plusCode);
+            
+            if ($isShort) {
+                // Short codes require a reference location
+                if ($refLat === null || $refLng === null) {
+                    global $logger;
+                    if (isset($logger)) {
+                        $logger->warning('Short Plus Code requires reference location', ['code' => $plusCode]);
+                    }
+                    return null;
+                }
+                
+                // Recover the full code using the reference location
+                $plusCode = \OpenLocationCode\OpenLocationCode::recoverNearest($plusCode, $refLat, $refLng);
+            }
+            
+            // Validate the Plus Code (full or recovered)
             if (!\OpenLocationCode\OpenLocationCode::isValid($plusCode)) {
                 return null;
             }

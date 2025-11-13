@@ -22,13 +22,26 @@ if (!isset($input['plusCode'])) {
 }
 
 $plusCode = trim($input['plusCode']);
+$refLat = isset($input['refLat']) ? (float)$input['refLat'] : null;
+$refLng = isset($input['refLng']) ? (float)$input['refLng'] : null;
 
-// Convert Plus Code to decimal
-$coords = pluscode_to_decimal($plusCode);
+// Convert Plus Code to decimal (with optional reference location for short codes)
+$coords = pluscode_to_decimal($plusCode, $refLat, $refLng);
 
 if ($coords === null) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid Plus Code format']);
+    $errorMsg = 'Invalid Plus Code format';
+    
+    // Check if it's a short code without reference
+    try {
+        if (\OpenLocationCode\OpenLocationCode::isShort($plusCode) && ($refLat === null || $refLng === null)) {
+            $errorMsg = 'Short Plus Code requires a reference location (nearby coordinates)';
+        }
+    } catch (\Exception $e) {
+        // Keep default error message
+    }
+    
+    echo json_encode(['success' => false, 'error' => $errorMsg]);
     exit;
 }
 
