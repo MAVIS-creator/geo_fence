@@ -186,13 +186,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      // Use watchPosition for better accuracy and continuous updates
+      let watchId;
+      let attempts = 0;
+      const maxAttempts = 3;
+      let bestAccuracy = Infinity;
+      let bestPosition = null;
+      
+      const statusEl = document.getElementById("status");
+      
+      watchId = navigator.geolocation.watchPosition(
         pos => {
-          const lat = pos.coords.latitude.toFixed(6);
-          const lng = pos.coords.longitude.toFixed(6);
-          verifyLocation(lat, lng);
+          attempts++;
+          
+          // Update best position if this one is more accurate
+          if (pos.coords.accuracy < bestAccuracy) {
+            bestAccuracy = pos.coords.accuracy;
+            bestPosition = pos;
+          }
+          
+          // Show real-time accuracy feedback
+          statusEl.innerHTML = '<i class="bx bx-current-location bx-spin"></i> Getting precise location...<br><span class="small">Accuracy: ±' + Math.round(pos.coords.accuracy) + 'm (attempt ' + attempts + '/' + maxAttempts + ')</span>';
+          
+          // After max attempts or good accuracy, verify location
+          if (attempts >= maxAttempts || pos.coords.accuracy <= 20) {
+            navigator.geolocation.clearWatch(watchId);
+            
+            if (bestPosition) {
+              statusEl.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Verifying location...<br><span class="small">Using position with ±' + Math.round(bestAccuracy) + 'm accuracy</span>';
+              const lat = bestPosition.coords.latitude.toFixed(6);
+              const lng = bestPosition.coords.longitude.toFixed(6);
+              verifyLocation(lat, lng);
+            }
+          }
         },
         err => {
+          navigator.geolocation.clearWatch(watchId);
           const statusEl = document.getElementById("status");
           statusEl.className = 'error';
           
@@ -215,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 20000,
           maximumAge: 0
         }
       );
