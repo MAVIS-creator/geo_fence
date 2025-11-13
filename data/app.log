@@ -213,3 +213,5 @@
 [2025-11-13T11:14:27.493094+00:00] gps_attendance.INFO: Expired token accessed {"jti":"368a337a-e913-4975-add6-fdea9269596b"} []
 [2025-11-13T11:14:34.612030+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
 [2025-11-13T11:14:34.613640+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-13T11:16:14.354329+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-13T11:16:14.358080+00:00] gps_attendance.INFO: Bootstrap loaded [] []
