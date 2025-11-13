@@ -15,6 +15,7 @@ A powerful web application that creates location-restricted links that only work
 - ✅ **CSRF Protection** - Secure forms with Symfony CSRF tokens
 - ✅ **Link Expiration** - Set custom expiry times for links
 - ✅ **Interactive Map** - Visual interface for setting geo-fence locations
+- ✅ **Multiple Coordinate Formats** - Support for Decimal, DMS, and Plus Codes
 
 ### User Experience
 - 🎨 Modern dark theme UI with smooth animations
