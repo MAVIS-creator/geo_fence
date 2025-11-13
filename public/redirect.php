@@ -142,6 +142,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h1>Geo-Fenced Link</h1>
     <p id="status" class="loading"><i class='bx bx-current-location bx-spin'></i> Verifying your location...</p>
     <p class="small" style="margin-top:12px">Please allow location access when prompted</p>
+    
+    <!-- Powered by Mavis branding -->
+    <div style="margin-top:40px;padding:20px;border-top:1px solid rgba(148,163,184,0.1)">
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
+        <img src="assets/mavis.jpg" alt="Mavis Logo" style="height:40px;width:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+        <span style="color:var(--text-muted);font-size:0.9rem;font-weight:500">Powered by <strong style="color:var(--accent-purple)">Mavis API System</strong></span>
+      </div>
+    </div>
   </div>
 
   <script>
