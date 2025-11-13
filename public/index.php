@@ -249,12 +249,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   const latInput = document.getElementById('lat');
   const lngInput = document.getElementById('lng');
   
+  // Function to convert DMS (Degrees Minutes Seconds) to decimal degrees
+  function dmsToDecimal(dms) {
+    // Try to match DMS format like: 8°09'56.6"N or 4°15'56.9"E
+    const dmsPattern = /(\d+)[°\s]+(\d+)['\s]+([0-9.]+)["'\s]*([NSEW])?/i;
+    const match = dms.match(dmsPattern);
+    
+    if (match) {
+      const degrees = parseFloat(match[1]);
+      const minutes = parseFloat(match[2]);
+      const seconds = parseFloat(match[3]);
+      const direction = match[4] ? match[4].toUpperCase() : '';
+      
+      // Convert to decimal
+      let decimal = degrees + (minutes / 60) + (seconds / 3600);
+      
+      // Apply negative for South and West
+      if (direction === 'S' || direction === 'W') {
+        decimal = -decimal;
+      }
+      
+      return decimal;
+    }
+    
+    // If not DMS, try parsing as decimal
+    const decimal = parseFloat(dms);
+    return isNaN(decimal) ? null : decimal;
+  }
+  
+  // Function to parse coordinate string that might contain both lat and lng
+  function parseCoordinateString(value, isLatField) {
+    // Check if the value contains both coordinates (like "8°09'56.6"N 4°15'56.9"E")
+    const bothCoordsPattern = /([^,]+)[,\s]+([^,]+)/;
+    const match = value.match(bothCoordsPattern);
+    
+    if (match && match[1] && match[2]) {
+      // Has both coordinates - parse each
+      const coord1 = dmsToDecimal(match[1].trim());
+      const coord2 = dmsToDecimal(match[2].trim());
+      
+      // Auto-fill both fields
+      if (coord1 !== null && coord2 !== null) {
+        // Determine which is lat and which is lng based on direction or value
+        let lat, lng;
+        if (match[1].match(/[NS]/i) || (Math.abs(coord1) <= 90 && Math.abs(coord2) > 90)) {
+          lat = coord1;
+          lng = coord2;
+        } else if (match[2].match(/[NS]/i) || (Math.abs(coord2) <= 90 && Math.abs(coord1) > 90)) {
+          lat = coord2;
+          lng = coord1;
+        } else {
+          // Default: first is lat, second is lng
+          lat = coord1;
+          lng = coord2;
+        }
+        
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        return isLatField ? lat : lng;
+      }
+    }
+    
+    // Single coordinate - just convert it
+    return dmsToDecimal(value.trim());
+  }
+  
   function updateMapFromInputs() {
-    const lat = parseFloat(latInput.value);
-    const lng = parseFloat(lngInput.value);
+    const latValue = latInput.value.trim();
+    const lngValue = lngInput.value.trim();
+    
+    // Parse coordinates (handles DMS or decimal)
+    const lat = parseCoordinateString(latValue, true);
+    const lng = parseCoordinateString(lngValue, false);
     
     // Validate coordinates
-    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+    if (lat !== null && lng !== null && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      // Update input fields with decimal format
+      latInput.value = lat.toFixed(6);
+      lngInput.value = lng.toFixed(6);
+      
       // Update marker and circle
       if (marker) map.removeLayer(marker);
       if (circle) map.removeLayer(circle);
