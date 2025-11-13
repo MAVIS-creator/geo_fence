@@ -17,7 +17,7 @@ if ($dms) {
 }
 
 // Test 2: Plus Code
-echo "\nTest 2: Plus Code\n";
+echo "\nTest 2: Plus Code (Full)\n";
 $plus = pluscode_to_decimal('6FRR5274+P6');
 if ($plus) {
     echo "✓ Plus Code conversion successful!\n";
@@ -25,6 +25,26 @@ if ($plus) {
     echo "  Output: {$plus['lat']}, {$plus['lng']}\n";
 } else {
     echo "✗ Plus Code conversion failed\n";
+}
+
+// Test 2b: Short Plus Code with reference
+echo "\nTest 2b: Plus Code (Short with Reference)\n";
+$shortPlus = pluscode_to_decimal('5274+P6', 8.16, 4.26);
+if ($shortPlus) {
+    echo "✓ Short Plus Code conversion successful!\n";
+    echo "  Input: 5274+P6 (reference: 8.16, 4.26)\n";
+    echo "  Output: {$shortPlus['lat']}, {$shortPlus['lng']}\n";
+} else {
+    echo "✗ Short Plus Code conversion failed\n";
+}
+
+// Test 2c: Short Plus Code without reference (should fail)
+echo "\nTest 2c: Plus Code (Short without Reference - should fail)\n";
+$shortPlusFail = pluscode_to_decimal('5274+P6');
+if ($shortPlusFail) {
+    echo "✗ Should have failed but succeeded\n";
+} else {
+    echo "✓ Correctly failed without reference location\n";
 }
 
 // Test 3: Parse coordinates (decimal)
