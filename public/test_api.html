@@ -48,10 +48,24 @@
     
     <div class="test-box">
         <h3>Test Plus Code Conversion</h3>
-        <button onclick="testPlusCode('6FRR5274+P6')">Test: 6FRR5274+P6</button>
-        <button onclick="testPlusCode('87G8Q23M+3M')">Test: 87G8Q23M+3M</button>
-        <button onclick="testPlusCode('8Q7XM4G2+GR')">Test: 8Q7XM4G2+GR</button>
+        <button onclick="testPlusCode('6FRR5274+P6')">Test Full: 6FRR5274+P6</button>
+        <button onclick="testPlusCode('87G8Q23M+3M')">Test Full: 87G8Q23M+3M</button>
+        <button onclick="testPlusCode('8Q7XM4G2+GR')">Test Full: 8Q7XM4G2+GR</button>
         <div id="plusCodeResult" class="result"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>Test Short Plus Code (with Reference)</h3>
+        <button onclick="testShortPlusCode('5274+P6', 8.16, 4.26)">Test: 5274+P6 (Lagos area)</button>
+        <button onclick="testShortPlusCode('Q23M+3M', 40.71, -74.01)">Test: Q23M+3M (NYC area)</button>
+        <button onclick="testShortPlusCode('M4G2+GR', 35.68, 139.65)">Test: M4G2+GR (Tokyo area)</button>
+        <div id="shortCodeResult" class="result"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>Test Short Plus Code Without Reference (Should Fail)</h3>
+        <button onclick="testPlusCode('5274+P6')">Test: 5274+P6 (no reference)</button>
+        <div id="shortFailResult" class="result"></div>
     </div>
 
     <div class="test-box">
@@ -64,6 +78,8 @@
         async function testPlusCode(code) {
             const resultEl = code === 'INVALID123' ? 
                 document.getElementById('invalidResult') : 
+                code === '5274+P6' ?
+                document.getElementById('shortFailResult') :
                 document.getElementById('plusCodeResult');
             
             resultEl.innerHTML = '⏳ Testing...';
@@ -81,6 +97,45 @@
                     resultEl.innerHTML = `
                         <span class="success">✓ Success!</span><br>
                         Input: ${code}<br>
+                        Latitude: ${data.lat}<br>
+                        Longitude: ${data.lng}
+                    `;
+                } else {
+                    resultEl.innerHTML = `
+                        <span class="error">✗ Error</span><br>
+                        ${data.error || 'Unknown error'}
+                    `;
+                }
+            } catch (error) {
+                resultEl.innerHTML = `
+                    <span class="error">✗ Request Failed</span><br>
+                    ${error.message}
+                `;
+            }
+        }
+
+        async function testShortPlusCode(code, refLat, refLng) {
+            const resultEl = document.getElementById('shortCodeResult');
+            resultEl.innerHTML = '⏳ Testing...';
+            
+            try {
+                const response = await fetch('convert_coords.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        plusCode: code,
+                        refLat: refLat,
+                        refLng: refLng
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultEl.innerHTML = `
+                        <span class="success">✓ Success!</span><br>
+                        Input: ${code}<br>
+                        Reference: ${refLat}, ${refLng}<br>
                         Latitude: ${data.lat}<br>
                         Longitude: ${data.lng}
                     `;
