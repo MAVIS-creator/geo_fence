@@ -1,35 +1,51 @@
-# 🌍 Geo-Fence Link Generator
+<h1 align="center">🌍 Geo-Fence Link Generator</h1>
 
-A powerful web application that creates location-restricted links that only work within specific GPS areas. Perfect for events, location-based content, treasure hunts, and geo-restricted access control.
+<p align="center">
+  <strong>Create location-restricted links that only work within specific GPS areas.</strong><br>
+  Perfect for events, location-based content, treasure hunts, and geo-restricted access control.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.0+-blue?logo=php" alt="PHP">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+  <img src="https://img.shields.io/badge/Build-Stable-success" alt="Status">
+  <img src="https://img.shields.io/badge/Security-JWT%20Protected-purple" alt="Security">
+</p>
+
+---
 
 ## 🚀 Features
 
-### Core Functionality
-- ✅ **Geo-Fenced Links** - Generate links that only work within a defined GPS radius
-- ✅ **JWT Security** - Tamper-proof tokens with cryptographic signing
-- ✅ **QR Code Generation** - Automatic QR codes for easy sharing
-- ✅ **Real-time Analytics** - Track access attempts, successes, and failures
-- ✅ **Rate Limiting** - Prevent abuse with configurable rate limits
-- ✅ **Email Notifications** - Optional alerts when links are accessed
-- ✅ **Admin Dashboard** - Manage all links and view analytics
-- ✅ **CSRF Protection** - Secure forms with Symfony CSRF tokens
-- ✅ **Link Expiration** - Set custom expiry times for links
-- ✅ **Interactive Map** - Visual interface for setting geo-fence locations
-- ✅ **Multiple Coordinate Formats** - Support for Decimal, DMS, and Plus Codes
+### ⚙️ Core Functionality
+- ✅ **Geo-Fenced Links** — Generate links restricted by GPS radius  
+- ✅ **JWT Security** — Tamper-proof tokens with cryptographic signing  
+- ✅ **QR Code Generation** — Auto-generate QR codes for easy sharing  
+- ✅ **Real-time Analytics** — Track all access attempts  
+- ✅ **Rate Limiting** — Configurable anti-spam shield  
+- ✅ **Email Notifications** — Optional access alerts  
+- ✅ **Admin Dashboard** — Manage links + analytics visually  
+- ✅ **CSRF Protection** — Symfony-based form security  
+- ✅ **Link Expiration** — Auto-expiry timer for each link  
+- ✅ **Interactive Map** — Set geofence via drag-and-drop  
+- ✅ **Multiple Coordinate Formats** — Decimal, DMS, Plus Codes (Full & Short)  
 
-### User Experience
-- 🎨 Modern dark theme UI with smooth animations
-- 📱 Fully responsive design (mobile, tablet, desktop)
-- 🗺️ Interactive Leaflet maps for location selection
-- 📋 One-click link copying
-- 🔒 Secure location verification
+### 🧠 User Experience
+- 🎨 Sleek **dark-theme UI** with smooth animations  
+- 📱 Fully responsive layout (mobile, tablet, desktop)  
+- 🗺️ Interactive **Leaflet.js** maps  
+- 📋 One-click link copying  
+- 🔒 Secure location verification flow  
+
+---
 
 ## 📋 Requirements
 
-- PHP 8.0+
-- Composer
-- Extensions: `sodium`, `json`, `curl`
-- Web server (Apache/Nginx) or PHP built-in server
+| Component | Version / Info |
+|------------|----------------|
+| **PHP** | 8.0+ |
+| **Composer** | Required |
+| **Extensions** | `sodium`, `json`, `curl` |
+| **Server** | Apache / Nginx / PHP built-in server |
 
 ## 🛠️ Installation
 
