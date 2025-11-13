@@ -240,3 +240,6 @@
 [2025-11-13T11:54:02.891236+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
 [2025-11-13T11:54:02.893364+00:00] gps_attendance.INFO: Bootstrap loaded [] []
 [2025-11-13T11:54:02.896925+00:00] gps_attendance.WARNING: Plus Code conversion failed {"code":"579G+GRH","error":"Passed Open Location Code is not a valid full code: 579G+GRH"} []
+[2025-11-13T11:54:42.396631+00:00] gps_attendance.DEBUG: Logger initialized (debug mode active) [] []
+[2025-11-13T11:54:42.399454+00:00] gps_attendance.INFO: Bootstrap loaded [] []
+[2025-11-13T11:54:42.402960+00:00] gps_attendance.WARNING: Plus Code conversion failed {"code":"579G+GRH","error":"Passed Open Location Code is not a valid full code: 579G+GRH"} []
