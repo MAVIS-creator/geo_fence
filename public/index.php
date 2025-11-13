@@ -228,18 +228,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       document.getElementById('useLocation').addEventListener('click', () => {
         if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
         const btn = document.getElementById('useLocation');
-        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting location...';
+        btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Getting precise location...';
         btn.disabled = true;
-        navigator.geolocation.getCurrentPosition(p => {
-          setPoint(p.coords.latitude, p.coords.longitude);
-          map.setView([p.coords.latitude, p.coords.longitude], 16);
-          btn.innerHTML = '<i class="bx bx-check"></i> Location Set!';
-          setTimeout(() => { btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location'; btn.disabled = false; }, 2000);
-        }, () => {
-          alert('Unable to get your location. Please allow location access.');
-          btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
-          btn.disabled = false;
-        }, { enableHighAccuracy: true, timeout: 10000 });
+        
+        // Try to get high accuracy position multiple times for better precision
+        let attempts = 0;
+        const maxAttempts = 3;
+        let bestAccuracy = Infinity;
+        let bestPosition = null;
+        
+        function tryGetPosition() {
+          navigator.geolocation.getCurrentPosition(p => {
+            attempts++;
+            if (p.coords.accuracy < bestAccuracy) {
+              bestAccuracy = p.coords.accuracy;
+              bestPosition = p;
+            }
+            
+            // Show accuracy feedback
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Accuracy: ' + Math.round(p.coords.accuracy) + 'm (attempt ' + attempts + '/' + maxAttempts + ')';
+            
+            if (attempts < maxAttempts && p.coords.accuracy > 20) {
+              // Try again if accuracy is poor
+              setTimeout(tryGetPosition, 1000);
+            } else {
+              // Use best position found
+              setPoint(bestPosition.coords.latitude, bestPosition.coords.longitude);
+              map.setView([bestPosition.coords.latitude, bestPosition.coords.longitude], 18);
+              btn.innerHTML = '<i class="bx bx-check"></i> Location Set! (±' + Math.round(bestAccuracy) + 'm)';
+              setTimeout(() => { 
+                btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location'; 
+                btn.disabled = false; 
+              }, 3000);
+            }
+          }, (err) => {
+            alert('Unable to get your location. Please ensure GPS is enabled and allow location access.');
+            btn.innerHTML = '<i class="bx bx-current-location"></i> Use My Current Location';
+            btn.disabled = false;
+          }, { 
+            enableHighAccuracy: true, 
+            timeout: 15000,
+            maximumAge: 0
+          });
+        }
+        
+        tryGetPosition();
       });
     }
 
