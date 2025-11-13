@@ -123,6 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <option value="dms">DMS (e.g., 8°09'56.6"N 4°15'56.9"E)</option>
           <option value="pluscode">Plus Code (e.g., 6FRR5274+P6)</option>
         </select>
+        <div class="small" style="color:var(--text-muted);margin-top:4px">
+          <i class='bx bx-info-circle'></i> 
+          <span id="formatHint">Click the map, use GPS, or enter coordinates manually</span>
+        </div>
       </div>
 
       <div id="decimalInputs">
@@ -412,12 +416,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   const dmsLatInput = document.getElementById('dmsLat');
   const dmsLngInput = document.getElementById('dmsLng');
   const plusCodeInput = document.getElementById('plusCode');
+  const formatHint = document.getElementById('formatHint');
+
+  const formatHints = {
+    decimal: 'Click the map, use GPS, or enter coordinates manually',
+    dms: 'Enter degrees, minutes, seconds with N/S/E/W (e.g., 8°09\'56.6"N)',
+    pluscode: 'Enter a Plus Code from Google Maps (e.g., 6FRR5274+P6)'
+  };
 
   coordFormat.addEventListener('change', () => {
     const format = coordFormat.value;
     decimalInputs.style.display = format === 'decimal' ? 'block' : 'none';
     dmsInputs.style.display = format === 'dms' ? 'block' : 'none';
     pluscodeInputs.style.display = format === 'pluscode' ? 'block' : 'none';
+    formatHint.textContent = formatHints[format] || '';
   });
 
   // Convert DMS to decimal and update map
