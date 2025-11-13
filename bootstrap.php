@@ -69,6 +69,116 @@ if (!function_exists('v_datetime')) {
     function v_datetime($x){ return v::stringType()->notEmpty()->validate($x); }
 }
 
+// 7b) Coordinate conversion helpers
+
+/**
+ * Convert DMS (Degrees, Minutes, Seconds) to Decimal Degrees
+ * Accepts formats like: 8°09'56.6"N or 4°15'56.9"E
+ * Returns: ['lat' => float, 'lng' => float] or null on failure
+ */
+if (!function_exists('dms_to_decimal')) {
+    function dms_to_decimal(string $dmsLat, string $dmsLng): ?array {
+        // Parse latitude (N/S)
+        $patternLat = '/(\d+)[°\s]+(\d+)[\'′\s]+([0-9.]+)[\"″\s]*([NS])/i';
+        if (!preg_match($patternLat, $dmsLat, $matchesLat)) {
+            return null;
+        }
+        $lat = (float)$matchesLat[1] + ((float)$matchesLat[2] / 60) + ((float)$matchesLat[3] / 3600);
+        if (strtoupper($matchesLat[4]) === 'S') {
+            $lat = -$lat;
+        }
+
+        // Parse longitude (E/W)
+        $patternLng = '/(\d+)[°\s]+(\d+)[\'′\s]+([0-9.]+)[\"″\s]*([EW])/i';
+        if (!preg_match($patternLng, $dmsLng, $matchesLng)) {
+            return null;
+        }
+        $lng = (float)$matchesLng[1] + ((float)$matchesLng[2] / 60) + ((float)$matchesLng[3] / 3600);
+        if (strtoupper($matchesLng[4]) === 'W') {
+            $lng = -$lng;
+        }
+
+        return ['lat' => $lat, 'lng' => $lng];
+    }
+}
+
+/**
+ * Convert Plus Code (Open Location Code) to Decimal Degrees
+ * Example: 6FRR5274+P6 → ['lat' => 8.1643, 'lng' => 4.2559]
+ * Returns: ['lat' => float, 'lng' => float] or null on failure
+ */
+if (!function_exists('pluscode_to_decimal')) {
+    function pluscode_to_decimal(string $plusCode): ?array {
+        try {
+            $olc = new \OpenLocationCode\OpenLocationCode();
+            
+            // Validate the Plus Code
+            if (!$olc->isValid($plusCode)) {
+                return null;
+            }
+            
+            // Decode to get the center coordinates
+            $decoded = $olc->decode($plusCode);
+            
+            return [
+                'lat' => $decoded->latitudeCenter,
+                'lng' => $decoded->longitudeCenter
+            ];
+        } catch (\Exception $e) {
+            global $logger;
+            if (isset($logger)) {
+                $logger->warning('Plus Code conversion failed', ['code' => $plusCode, 'error' => $e->getMessage()]);
+            }
+            return null;
+        }
+    }
+}
+
+/**
+ * Smart coordinate parser - detects format and converts to decimal
+ * Supports: Decimal degrees, DMS, Plus Codes
+ * Returns: ['lat' => float, 'lng' => float] or null on failure
+ */
+if (!function_exists('parse_coordinates')) {
+    function parse_coordinates(string $input1, ?string $input2 = null): ?array {
+        $input1 = trim($input1);
+        $input2 = $input2 ? trim($input2) : null;
+        
+        // Case 1: Plus Code (single input, contains +)
+        if (strpos($input1, '+') !== false && $input2 === null) {
+            return pluscode_to_decimal($input1);
+        }
+        
+        // Case 2: DMS format (two inputs with ° or ' or ")
+        if ($input2 !== null && 
+            (strpos($input1, '°') !== false || strpos($input1, "'") !== false || strpos($input1, '"') !== false)) {
+            return dms_to_decimal($input1, $input2);
+        }
+        
+        // Case 3: Decimal degrees (two inputs, both numeric)
+        if ($input2 !== null) {
+            $lat = filter_var($input1, FILTER_VALIDATE_FLOAT);
+            $lng = filter_var($input2, FILTER_VALIDATE_FLOAT);
+            
+            if ($lat !== false && $lng !== false && $lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return ['lat' => $lat, 'lng' => $lng];
+            }
+        }
+        
+        // Case 4: Single input decimal degrees (comma or space separated)
+        if ($input2 === null && preg_match('/^([-+]?[0-9.]+)[,\s]+([-+]?[0-9.]+)$/', $input1, $matches)) {
+            $lat = (float)$matches[1];
+            $lng = (float)$matches[2];
+            
+            if ($lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180) {
+                return ['lat' => $lat, 'lng' => $lng];
+            }
+        }
+        
+        return null;
+    }
+}
+
 // 8) JWT helpers
 function jwt_config(): Configuration {
     $secret = $_ENV['JWT_SECRET'] ?? 'dev-secret';
