@@ -125,6 +125,35 @@ Visit: `http://localhost:8000`
 | Dates | `nesbot/carbon` |
 | QR Codes | `endroid/qr-code` |
 | UUIDs | `ramsey/uuid` |
+| Plus Codes | `c3t4r4/openlocationcode` |
+
+## 📍 Coordinate Format Support
+
+The system supports multiple ways to input coordinates:
+
+### 1. Decimal Degrees (Default)
+```
+8.165722, 4.265806
+```
+
+### 2. DMS (Degrees, Minutes, Seconds)
+```
+8°09'56.6"N 4°15'56.9"E
+```
+
+### 3. Plus Codes (Open Location Code)
+```
+6FRR5274+P6
+```
+
+**How to get a Plus Code:**
+1. Open Google Maps
+2. Long-press any location
+3. Tap the coordinates at the bottom
+4. Scroll down to find the Plus Code
+5. Copy and paste into the generator!
+
+All formats are automatically converted to decimal degrees internally. See [COORDINATE_FORMATS.md](COORDINATE_FORMATS.md) for detailed examples and usage instructions.
 
 ### File Structure
 
