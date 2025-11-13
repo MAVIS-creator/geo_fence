@@ -134,100 +134,103 @@ php -S localhost:8000 -t public
 | UUIDs | `ramsey/uuid` |
 | Plus Codes | `c3t4r4/openlocationcode` |
 
-## 📍 Coordinate Format Support
+---
 
-The system supports multiple ways to input coordinates:
+## 📍 Coordinate Formats Supported
 
-### 1. Decimal Degrees (Default)
-```
-8.165722, 4.265806
-```
+| Format | Example |
+|--------|---------|
+| **Decimal Degrees** | `8.165722, 4.265806` |
+| **DMS** | `8°09'56.6"N 4°15'56.9"E` |
+| **Plus Codes (Full)** | `6FRR5274+P6` |
+| **Plus Codes (Short)** | `5274+P6` (needs reference) |
 
-### 2. DMS (Degrees, Minutes, Seconds)
-```
-8°09'56.6"N 4°15'56.9"E
-```
+📘 **Tip:** Get Plus Codes from Google Maps → Long press → Copy code.
 
-### 3. Plus Codes (Open Location Code)
-```
-6FRR5274+P6
-```
+📄 **Details:** See [COORDINATE_FORMATS.md](COORDINATE_FORMATS.md) and [SHORT_PLUS_CODE_SUPPORT.md](SHORT_PLUS_CODE_SUPPORT.md)
 
-**How to get a Plus Code:**
-1. Open Google Maps
-2. Long-press any location
-3. Tap the coordinates at the bottom
-4. Scroll down to find the Plus Code
-5. Copy and paste into the generator!
+---
 
-All formats are automatically converted to decimal degrees internally. See [COORDINATE_FORMATS.md](COORDINATE_FORMATS.md) for detailed examples and usage instructions.
-
-### File Structure
+## 🗂️ File Structure
 
 ```
 geo_fence/
 ├── public/
-│   ├── index.php        # Link creation page
-│   ├── dashboard.php    # Analytics dashboard
-│   ├── redirect.php     # Geo-fence verification
+│   ├── index.php              # Link creation page
+│   ├── dashboard.php          # Analytics dashboard
+│   ├── redirect.php           # Geo-fence verification
+│   ├── convert_coords.php     # Coordinate conversion API
+│   ├── coordinate_help.html   # Coordinate format guide
+│   ├── test_api.html          # API testing interface
 │   └── assets/
-│       └── style.css    # Modern UI styling
+│       ├── style.css          # UI styling
+│       └── mavis.jpg          # Branding logo
 ├── data/
-│   ├── links.json       # Persistent link storage
-│   ├── analytics.json   # Access tracking data
-│   ├── rate_limits.json # Rate limiting state
-│   └── app.log          # Application logs
-├── bootstrap.php        # Core initialization
-├── composer.json        # Dependencies
-└── .env                 # Configuration
+│   ├── links.json             # Stored links
+│   ├── analytics.json         # Access logs
+│   ├── rate_limits.json       # Rate limiter state
+│   └── app.log                # Application logs
+├── tools/
+│   ├── test_coords.php        # Coordinate conversion tests
+│   └── test_link.php          # Link generation tests
+├── vendor/                    # Composer dependencies
+├── bootstrap.php              # Core initialization
+├── composer.json              # Dependency definitions
+├── .env                       # Environment configuration
+├── README.md                  # This file
+├── COORDINATE_FORMATS.md      # Coordinate format guide
+├── SHORT_PLUS_CODE_SUPPORT.md # Short Plus Code documentation
+└── IMPLEMENTATION_SUMMARY.md  # Technical implementation details
 ```
 
-### Security Features
+---
 
-- **JWT Signing** - All geo-fence data is cryptographically signed
-- **CSRF Protection** - Forms protected against cross-site attacks
-- **Rate Limiting** - Configurable per-IP request throttling
-- **Input Validation** - Strict lat/lng/radius validation
-- **No Database** - JSON file storage (easily upgradable to DB)
+## 🧱 Security Highlights
 
-## 🎯 Use Cases
+- 🔐 **JWT Signing** — Tamper-proof tokens
+- 🧩 **CSRF Protection** — Secure forms
+- 🚫 **Rate Limiting** — Prevent abuse
+- 🧾 **Strict Validation** — Inputs verified
+- 💾 **No Database** — JSON-based lightweight storage
 
-- 🎪 **Event Access** - Links that only work at your event location
-- 🏫 **Campus Gating** - Content only accessible on university grounds
-- 🎁 **Treasure Hunts** - Location-based clue progression
-- 🎬 **Geo-Marketing** - Promotional content for local visitors
-- 📍 **Attendance** - Verify physical presence at a location
-- 🔐 **Restricted Content** - Location-based content gates
+---
 
-## ⚙️ Configuration
+## 🎯 Real-World Use Cases
 
-### Rate Limiting
+- 🎪 **Event access control**
+- 🏫 **Campus-based content**
+- 🎁 **Treasure hunts**
+- 🎬 **Localized marketing**
+- 📍 **Attendance tracking**
+- 🔐 **Restricted document access**
 
-Edit `.env`:
+---
+
+## ⚙️ Configuration Tweaks
+
+### ⏱ Rate Limiting
+
 ```env
-RATE_LIMIT_MAX=15      # Max attempts
-RATE_LIMIT_WINDOW=60   # Time window in seconds
+RATE_LIMIT_MAX=15
+RATE_LIMIT_WINDOW=60
 ```
 
-### Email Notifications
+### 📧 Email Alerts
 
-To enable email alerts on link access:
 ```env
 NOTIFICATION_EMAIL=admin@example.com
 ```
 
-**Note:** Uses PHP's `mail()` function. For production, configure SMTP.
+### 🔑 JWT Secret
 
-### JWT Security
-
-Generate a secure secret:
 ```bash
 php -r "echo bin2hex(random_bytes(32));"
 ```
 
-Update `.env`:
+Then add:
+
 ```env
-JWT_SECRET=your-generated-secret-here
+JWT_SECRET=your-generated-secret
 ```
 
 ## 📊 Dashboard Features
