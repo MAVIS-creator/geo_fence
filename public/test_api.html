@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Coordinate Conversion API</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        .test-box {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background: #6d28d9; }
+        .result {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Coordinate Conversion</h1>
+    
+    <div class="test-box">
+        <h3>Test Plus Code Conversion</h3>
+        <button onclick="testPlusCode('6FRR5274+P6')">Test: 6FRR5274+P6</button>
+        <button onclick="testPlusCode('87G8Q23M+3M')">Test: 87G8Q23M+3M</button>
+        <button onclick="testPlusCode('8Q7XM4G2+GR')">Test: 8Q7XM4G2+GR</button>
+        <div id="plusCodeResult" class="result"></div>
+    </div>
+
+    <div class="test-box">
+        <h3>Test Invalid Plus Code</h3>
+        <button onclick="testPlusCode('INVALID123')">Test Invalid</button>
+        <div id="invalidResult" class="result"></div>
+    </div>
+
+    <script>
+        async function testPlusCode(code) {
+            const resultEl = code === 'INVALID123' ? 
+                document.getElementById('invalidResult') : 
+                document.getElementById('plusCodeResult');
+            
+            resultEl.innerHTML = '⏳ Testing...';
+            
+            try {
+                const response = await fetch('convert_coords.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plusCode: code })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultEl.innerHTML = `
+                        <span class="success">✓ Success!</span><br>
+                        Input: ${code}<br>
+                        Latitude: ${data.lat}<br>
+                        Longitude: ${data.lng}
+                    `;
+                } else {
+                    resultEl.innerHTML = `
+                        <span class="error">✗ Error</span><br>
+                        ${data.error || 'Unknown error'}
+                    `;
+                }
+            } catch (error) {
+                resultEl.innerHTML = `
+                    <span class="error">✗ Request Failed</span><br>
+                    ${error.message}
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
