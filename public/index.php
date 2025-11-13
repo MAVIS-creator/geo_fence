@@ -231,6 +231,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+  // Coordinate conversion functions
+  function parseDMS(dmsLat, dmsLng) {
+    const latPattern = /(\d+)[°\s]+(\d+)['′\s]+([0-9.]+)["″\s]*([NS])/i;
+    const lngPattern = /(\d+)[°\s]+(\d+)['′\s]+([0-9.]+)["″\s]*([EW])/i;
+    
+    const latMatch = dmsLat.match(latPattern);
+    const lngMatch = dmsLng.match(lngPattern);
+    
+    if (!latMatch || !lngMatch) return null;
+    
+    let lat = parseFloat(latMatch[1]) + (parseFloat(latMatch[2]) / 60) + (parseFloat(latMatch[3]) / 3600);
+    if (latMatch[4].toUpperCase() === 'S') lat = -lat;
+    
+    let lng = parseFloat(lngMatch[1]) + (parseFloat(lngMatch[2]) / 60) + (parseFloat(lngMatch[3]) / 3600);
+    if (lngMatch[4].toUpperCase() === 'W') lng = -lng;
+    
+    return { lat, lng };
+  }
+
+  async function parsePlusCode(code) {
+    try {
+      // Call backend to convert Plus Code
+      const response = await fetch('<?= $_ENV['APP_URL'] ?? '' ?>/convert_coords.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plusCode: code })
+      });
+      const data = await response.json();
+      return data.success ? { lat: data.lat, lng: data.lng } : null;
+    } catch (e) {
+      console.error('Plus Code conversion failed:', e);
+      return null;
+    }
+  }
+
   const mapEl = document.getElementById('map');
   if (!mapEl) throw new Error('Map element not found.');
 
@@ -368,6 +403,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   urlInput.addEventListener('input', updateUrlHint);
   urlInput.addEventListener('blur', updateUrlHint);
   updateUrlHint();
+
+  // Coordinate format switcher
+  const coordFormat = document.getElementById('coordFormat');
+  const decimalInputs = document.getElementById('decimalInputs');
+  const dmsInputs = document.getElementById('dmsInputs');
+  const pluscodeInputs = document.getElementById('pluscodeInputs');
+  const dmsLatInput = document.getElementById('dmsLat');
+  const dmsLngInput = document.getElementById('dmsLng');
+  const plusCodeInput = document.getElementById('plusCode');
+
+  coordFormat.addEventListener('change', () => {
+    const format = coordFormat.value;
+    decimalInputs.style.display = format === 'decimal' ? 'block' : 'none';
+    dmsInputs.style.display = format === 'dms' ? 'block' : 'none';
+    pluscodeInputs.style.display = format === 'pluscode' ? 'block' : 'none';
+  });
+
+  // Convert DMS to decimal and update map
+  async function convertAndUpdate() {
+    const format = coordFormat.value;
+    let coords = null;
+
+    if (format === 'dms') {
+      coords = parseDMS(dmsLatInput.value, dmsLngInput.value);
+      if (!coords) {
+        alert('Invalid DMS format. Example: 8°09\'56.6"N 4°15\'56.9"E');
+        return;
+      }
+    } else if (format === 'pluscode') {
+      coords = await parsePlusCode(plusCodeInput.value);
+      if (!coords) {
+        alert('Invalid Plus Code. Example: 6FRR5274+P6');
+        return;
+      }
+    }
+
+    if (coords) {
+      // Update decimal inputs (hidden form fields)
+      latInput.value = coords.lat.toFixed(6);
+      lngInput.value = coords.lng.toFixed(6);
+      
+      // Update map
+      setPoint(coords.lat, coords.lng);
+      map.setView([coords.lat, coords.lng], 16);
+    }
+  }
+
+  // Listen for changes in DMS and Plus Code inputs
+  dmsLatInput.addEventListener('blur', convertAndUpdate);
+  dmsLngInput.addEventListener('blur', convertAndUpdate);
+  plusCodeInput.addEventListener('blur', convertAndUpdate);
+
 </script>
 
 </body>
