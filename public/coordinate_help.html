@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinate Format Examples</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 { color: #a78bfa; }
+        h2 { color: #8b5cf6; margin-top: 0; }
+        .example {
+            background: rgba(124, 58, 237, 0.1);
+            border-left: 3px solid #7c3aed;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        code {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #06b6d4;
+        }
+        .success { color: #10b981; }
+        .info { color: #06b6d4; }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Coordinate Format Support</h1>
+    
+    <div class="card">
+        <h2>📍 1. Decimal Degrees (Default)</h2>
+        <p>Most common format, used by GPS devices and mapping apps.</p>
+        <div class="example">
+            <strong>Examples:</strong><br>
+            Lagos: <code>8.165722, 4.265806</code><br>
+            New York: <code>40.7128, -74.0060</code><br>
+            Tokyo: <code>35.6762, 139.6503</code>
+        </div>
+        <p class="info">✓ Just enter the numbers directly in the Lat/Lng fields!</p>
+    </div>
+
+    <div class="card">
+        <h2>🧭 2. DMS (Degrees, Minutes, Seconds)</h2>
+        <p>Traditional navigation format with directional indicators.</p>
+        <div class="example">
+            <strong>Examples:</strong><br>
+            Lagos:<br>
+            • Latitude: <code>8°09'56.6"N</code><br>
+            • Longitude: <code>4°15'56.9"E</code><br><br>
+            
+            New York:<br>
+            • Latitude: <code>40°42'46.1"N</code><br>
+            • Longitude: <code>74°00'21.6"W</code>
+        </div>
+        <p class="info">✓ Select "DMS" format, enter both coordinates, then tab out to convert!</p>
+    </div>
+
+    <div class="card">
+        <h2>➕ 3. Plus Codes (Open Location Code)</h2>
+        <p>Google's open-source location codes. Find them on Google Maps!</p>
+        <div class="example">
+            <strong>Examples:</strong><br>
+            Lagos area: <code>6FRR5274+P6</code><br>
+            New York: <code>87G8Q23M+3M</code><br>
+            Tokyo: <code>8Q7XM4G2+GR</code>
+        </div>
+        <p class="info">✓ Get Plus Codes from Google Maps → Long press → Copy the Plus Code!</p>
+    </div>
+
+    <div class="card">
+        <h2>🎯 How to Use</h2>
+        <ol>
+            <li>Go to the <strong>Geo-Fence Link Generator</strong></li>
+            <li>Select your preferred <strong>coordinate format</strong> from the dropdown</li>
+            <li>Enter the coordinates in that format</li>
+            <li>The map will automatically update when you tab out!</li>
+            <li>Continue creating your geo-fenced link as usual</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <h2>✨ Features</h2>
+        <ul>
+            <li class="success">✓ Automatic conversion to decimal degrees</li>
+            <li class="success">✓ Real-time map updates</li>
+            <li class="success">✓ Input validation with helpful error messages</li>
+            <li class="success">✓ Works alongside click-to-select and GPS location</li>
+            <li class="success">✓ Open-source Plus Code library (no API limits!)</li>
+        </ul>
+    </div>
+
+    <div class="card" style="text-align: center;">
+        <p><a href="index.php" style="color: #a78bfa; text-decoration: none; font-weight: bold;">→ Go to Link Generator</a></p>
+    </div>
+</body>
+</html>
